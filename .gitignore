@@ -53,3 +53,4 @@ Thumbs.db
 .agents/
 test
 prompt.yml
+.vercel
