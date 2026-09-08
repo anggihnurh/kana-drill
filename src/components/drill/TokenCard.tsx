@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { TokenItem } from '../../types/drill';
 import { cn } from '../../lib/utils';
-import { Check, X } from 'lucide-react';
+import { Check, X, Volume2 } from 'lucide-react';
+import { speakKana } from '../../hooks/useKanaAudio';
 
 interface TokenCardProps {
   index: number;
@@ -19,6 +20,18 @@ export const TokenCard: React.FC<TokenCardProps> = React.memo(
   ({ index, token, isActive, onClick }) => {
     const isAnswered = token.userAnswer !== undefined;
     const isCorrect = token.isCorrect;
+    const [isPlaying, setIsPlaying] = useState(false);
+
+    const handlePlayAudio = useCallback(
+      (e: React.MouseEvent) => {
+        e.stopPropagation(); // prevent card click
+        setIsPlaying(true);
+        speakKana(token.kanaText);
+        // Reset visual indicator after short delay
+        setTimeout(() => setIsPlaying(false), 700);
+      },
+      [token.kanaText]
+    );
 
     return (
       <div
@@ -85,7 +98,7 @@ export const TokenCard: React.FC<TokenCardProps> = React.memo(
           ) : null}
         </div>
 
-        {/* Bottom row: User answer or romaji hint */}
+        {/* Bottom row: User answer, romaji hint, or audio button */}
         <div className="w-full text-center min-h-[22px] flex items-center justify-center">
           {isAnswered ? (
             <div className="w-full px-1">
@@ -115,6 +128,33 @@ export const TokenCard: React.FC<TokenCardProps> = React.memo(
             </span>
           )}
         </div>
+
+        {/* Audio Button — absolute bottom-right corner */}
+        <button
+          type="button"
+          onClick={handlePlayAudio}
+          aria-label={`Putar bunyi ${token.kanaText}`}
+          title={`Putar bunyi: ${token.kanaText}`}
+          className={cn(
+            'absolute bottom-2.5 right-2.5 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150 cursor-pointer z-10',
+            'opacity-40 hover:opacity-100 hover:scale-110 active:scale-95',
+            isPlaying && 'opacity-100 scale-110',
+            isActive
+              ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/60 dark:text-indigo-300'
+              : isAnswered && isCorrect
+                ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400'
+                : isAnswered && !isCorrect
+                  ? 'bg-rose-100 text-rose-600 dark:bg-rose-900/50 dark:text-rose-400'
+                  : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'
+          )}
+        >
+          <Volume2
+            className={cn(
+              'w-3 h-3 transition-transform duration-150',
+              isPlaying && 'animate-pulse'
+            )}
+          />
+        </button>
       </div>
     );
   }
