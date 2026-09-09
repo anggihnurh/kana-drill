@@ -86,26 +86,21 @@ export const TokenCard: React.FC<TokenCardProps> = React.memo(
           )}
         </div>
 
-        {/* Japanese Kana Text Display - Single Line */}
-        <div className="my-2 sm:my-3 text-center w-full px-1 overflow-hidden flex flex-col items-center justify-center min-h-[48px] sm:min-h-[56px]">
+        {/* Japanese Kana Text Display - Uniform Typography & Balanced Whitespace */}
+        <div className="my-auto py-2 text-center w-full px-1 overflow-hidden flex flex-col items-center justify-center min-h-[56px] sm:min-h-[64px]">
           <span
-            className={cn(
-              'font-japanese font-bold leading-none block drop-shadow-sm whitespace-nowrap max-w-full truncate',
-              token.kanaText.length <= 1 && 'text-3xl sm:text-4xl lg:text-5xl tracking-wider',
-              token.kanaText.length === 2 && 'text-2xl sm:text-3xl lg:text-4xl tracking-wider',
-              token.kanaText.length === 3 && 'text-xl sm:text-2xl lg:text-3xl tracking-normal',
-              token.kanaText.length === 4 && 'text-lg sm:text-xl lg:text-2xl tracking-tight',
-              token.kanaText.length >= 5 && 'text-base sm:text-lg lg:text-xl tracking-tight'
-            )}
+            className="font-japanese text-2xl sm:text-3xl lg:text-[32px] font-bold tracking-wide leading-tight block drop-shadow-sm whitespace-nowrap max-w-full truncate"
             title={token.kanaText}
           >
             {token.kanaText}
           </span>
           {token.meaning ? (
-            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1.5 truncate max-w-full italic px-1">
+            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 truncate max-w-full italic px-1 font-normal">
               {token.meaning}
             </p>
-          ) : null}
+          ) : (
+            <div className="h-[17px]" aria-hidden="true" />
+          )}
         </div>
 
         {/* Bottom row: User answer, romaji hint, or audio button */}
