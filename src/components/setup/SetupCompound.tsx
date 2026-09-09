@@ -1,5 +1,21 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { SetupContext, useSetupContext, SetupContextValue } from './SetupContext';
+import {
+  Award,
+  BookOpen,
+  Check,
+  Flame,
+  History,
+  Layers,
+  Play,
+  PlayCircle,
+  RotateCcw,
+  Shuffle,
+  Sparkles,
+  Trash2,
+  Zap
+} from 'lucide-react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { playSound } from '../../lib/soundEffects';
+import { cn } from '../../lib/utils';
 import { useDrillStore } from '../../store/useDrillStore';
 import { useHistoryStore } from '../../store/useHistoryStore';
 import { DrillMode, KanaCategory, KanaScript, SessionConfig } from '../../types/drill';
@@ -7,29 +23,7 @@ import { HistoryModal } from '../history/HistoryModal';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Card, CardDescription, CardTitle } from '../ui/card';
-import { playSound } from '../../lib/soundEffects';
-import {
-  Award,
-  BookOpen,
-  History,
-  Layers,
-  Play,
-  Shuffle,
-  Volume2,
-  VolumeX,
-  Zap,
-  Sparkles,
-  Flame,
-  Check,
-  RotateCcw,
-  PlayCircle,
-  Trash2,
-  Smartphone,
-  Keyboard,
-  Mic,
-} from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { usePWAInstall } from '../../hooks/usePWAInstall';
+import { SetupContext, SetupContextValue, useSetupContext } from './SetupContext';
 
 interface PresetItem {
   id: string;
@@ -607,8 +601,8 @@ export const SetupCategoryMatrix: React.FC = () => {
 // 7. Setup Session Overview & Action
 // ==========================================
 export const SetupSessionOverview: React.FC = () => {
-  const { state, actions } = useSetupContext();
-  const { isInstallable, promptInstall } = usePWAInstall();
+  const { actions } = useSetupContext();
+  // const { isInstallable, promptInstall } = usePWAInstall();
 
   return (
     <Card className="p-5 flex flex-col justify-between h-full bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-lg">
@@ -639,16 +633,16 @@ export const SetupSessionOverview: React.FC = () => {
               120 Token Kana
             </span>
           </div>
-          <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800/80">
+          {/* <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800/80">
             <span className="text-zinc-500 dark:text-zinc-400">Pengukuran Waktu</span>
             <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
               Timer per Soal
             </span>
-          </div>
+          </div> */}
         </div>
 
         {/* Sound toggle with tactile tester */}
-        <div className="mt-5 p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-950/70 border border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+        {/* <div className="mt-5 p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-950/70 border border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
           <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
             {state.config.soundEnabled ? (
               <Volume2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
@@ -673,10 +667,10 @@ export const SetupSessionOverview: React.FC = () => {
               )}
             />
           </button>
-        </div>
+        </div> */}
 
         {/* Mode Menjawab: Text vs Voice */}
-        <div className="mt-4 space-y-2">
+        {/* <div className="mt-4 space-y-2">
           <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             <span>Mode Menjawab</span>
             <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold">
@@ -722,7 +716,7 @@ export const SetupSessionOverview: React.FC = () => {
               </span>
             </button>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Action buttons */}
@@ -736,7 +730,7 @@ export const SetupSessionOverview: React.FC = () => {
           <span>Mulai Sesi Drill (10 Soal)</span>
         </Button>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div>
           <Button
             variant="secondary"
             onClick={() => actions.setIsHistoryOpen(true)}
@@ -745,7 +739,7 @@ export const SetupSessionOverview: React.FC = () => {
             <History className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
             <span>Riwayat & Statistik</span>
           </Button>
-
+          {/* 
           {isInstallable ? (
             <Button
               variant="outline"
@@ -755,7 +749,7 @@ export const SetupSessionOverview: React.FC = () => {
               <Smartphone className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
               <span>Pasang Aplikasi (PWA)</span>
             </Button>
-          ) : null}
+          ) : null} */}
         </div>
       </div>
     </Card>
