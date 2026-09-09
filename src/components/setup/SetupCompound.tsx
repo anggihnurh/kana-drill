@@ -24,8 +24,10 @@ import {
   RotateCcw,
   PlayCircle,
   Trash2,
+  Smartphone,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { usePWAInstall } from '../../hooks/usePWAInstall';
 
 interface PresetItem {
   id: string;
@@ -594,6 +596,7 @@ export const SetupCategoryMatrix: React.FC = () => {
 // ==========================================
 export const SetupSessionOverview: React.FC = () => {
   const { state, actions } = useSetupContext();
+  const { isInstallable, promptInstall } = usePWAInstall();
 
   return (
     <Card className="p-5 flex flex-col justify-between h-full bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-lg">
@@ -672,14 +675,27 @@ export const SetupSessionOverview: React.FC = () => {
           <span>Mulai Sesi Drill (10 Soal)</span>
         </Button>
 
-        <Button
-          variant="secondary"
-          onClick={() => actions.setIsHistoryOpen(true)}
-          className="w-full h-10 gap-2 text-xs font-semibold cursor-pointer"
-        >
-          <History className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
-          <span>Lihat Riwayat & Statistik</span>
-        </Button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <Button
+            variant="secondary"
+            onClick={() => actions.setIsHistoryOpen(true)}
+            className="w-full h-10 gap-2 text-xs font-semibold cursor-pointer"
+          >
+            <History className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
+            <span>Riwayat & Statistik</span>
+          </Button>
+
+          {isInstallable ? (
+            <Button
+              variant="outline"
+              onClick={promptInstall}
+              className="w-full h-10 gap-2 text-xs font-semibold border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-indigo-800 dark:text-indigo-300 dark:hover:bg-indigo-950/40 cursor-pointer"
+            >
+              <Smartphone className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <span>Pasang Aplikasi (PWA)</span>
+            </Button>
+          ) : null}
+        </div>
       </div>
     </Card>
   );

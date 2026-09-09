@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="50%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#7c3aed" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e0e7ff" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000000" flood-opacity="0.35" />
+    </filter>
+  </defs>
+  
+  <!-- App Icon Background with smooth rounded squircle -->
+  <rect width="512" height="512" rx="128" fill="url(#bg)" />
+  
+  <!-- Subtle inner border overlay -->
+  <rect x="8" y="8" width="496" height="496" rx="120" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="4" />
+  
+  <!-- Decorative Speed Accents -->
+  <path d="M120 130 Q180 100 240 120" stroke="rgba(255,255,255,0.25)" stroke-width="8" stroke-linecap="round" fill="none" />
+  <circle cx="390" cy="140" r="12" fill="#fbbf24" />
+  <path d="M370 120 L378 135 L395 138 L382 150 L386 168 L370 158 L354 168 L358 150 L345 138 L362 135 Z" fill="#fbbf24" />
+
+  <!-- Center Kana Glyph: あ (Stylized Bold Japanese Letter) -->
+  <text 
+    x="50%" 
+    y="56%" 
+    text-anchor="middle" 
+    dominant-baseline="central" 
+    font-family="'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" 
+    font-size="280" 
+    font-weight="900" 
+    fill="url(#accent)"
+    filter="url(#shadow)"
+  >あ</text>
+  
+  <!-- Bottom Lightning bolt speed indicator -->
+  <path d="M220 440 L265 375 L245 375 L285 330" stroke="#fbbf24" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+</svg>
