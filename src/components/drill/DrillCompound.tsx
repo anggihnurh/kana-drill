@@ -415,7 +415,7 @@ export const DrillInputBar: React.FC = () => {
             value={state.currentInput}
             onChange={(e) => actions.setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={`Ketik Romaji (misal: ${state.currentToken?.expectedRomaji[0] || 'romaji'})... Tekan Spasi/Enter`}
+            placeholder={`Ketik Romaji... Tekan Spasi/Enter`}
             autoFocus
             autoComplete="off"
             autoCapitalize="off"
