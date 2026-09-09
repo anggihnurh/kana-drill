@@ -131,8 +131,8 @@ export function generateSessionQuestions(config: SessionConfig): Question[] {
   const filteredVocab = VOCAB_BY_SCRIPT[config.script] || VOCAB_DATABASE;
 
   const TOTAL_QUESTIONS = 10;
-  const TOKENS_PER_QUESTION = 10;
-  const TOTAL_TOKENS_NEEDED = TOTAL_QUESTIONS * TOKENS_PER_QUESTION; // 100 tokens
+  const TOKENS_PER_QUESTION = 12;
+  const TOTAL_TOKENS_NEEDED = TOTAL_QUESTIONS * TOKENS_PER_QUESTION; // 120 tokens
 
   const shuffledVocab = shuffleArray(filteredVocab);
   let vocabIndex = 0;

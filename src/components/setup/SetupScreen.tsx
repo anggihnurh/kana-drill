@@ -3,12 +3,13 @@ import { Setup } from './SetupCompound';
 
 /**
  * SetupScreen composed with Vercel Composition Patterns
- * Uses compound components (Setup.Root, Setup.Hero, Setup.Presets, Setup.ScriptSelector, Setup.ModeSelector, Setup.CategoryMatrix, Setup.SessionOverview)
+ * Uses compound components (Setup.Root, Setup.Hero, Setup.ResumeBanner, Setup.Presets, ...)
  */
 export const SetupScreen: React.FC = () => {
   return (
     <Setup.Root>
       <Setup.Hero />
+      <Setup.ResumeBanner />
       <Setup.Presets />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

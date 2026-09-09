@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import {
   Question,
   QuestionRecord,
@@ -10,6 +11,8 @@ import { generateSessionQuestions } from '../lib/drillGenerator';
 import { isRomajiMatch } from '../lib/romajiValidator';
 import { playSound } from '../lib/soundEffects';
 import { useHistoryStore } from './useHistoryStore';
+
+const SAVED_SESSION_KEY = 'kana_drill_session_v1';
 
 interface DrillState {
   status: 'idle' | 'running' | 'paused' | 'finished';
@@ -23,6 +26,9 @@ interface DrillState {
   maxStreak: number;
   lastCompletedSession: SessionRecord | null;
 
+  // Derived
+  hasSavedSession: boolean;
+
   // Actions
   setConfig: (config: Partial<SessionConfig>) => void;
   startSession: (customConfig?: Partial<SessionConfig>) => void;
@@ -34,6 +40,7 @@ interface DrillState {
   resumeSession: () => void;
   resetSession: () => void;
   retryMistakes: () => void;
+  clearSavedSession: () => void;
 }
 
 export const DEFAULT_CONFIG: SessionConfig = {
@@ -43,7 +50,9 @@ export const DEFAULT_CONFIG: SessionConfig = {
   soundEnabled: true,
 };
 
-export const useDrillStore = create<DrillState>((set, get) => ({
+export const useDrillStore = create<DrillState>()(
+  persist(
+    (set, get) => ({
   status: 'idle',
   config: DEFAULT_CONFIG,
   questions: [],
@@ -54,6 +63,7 @@ export const useDrillStore = create<DrillState>((set, get) => ({
   streak: 0,
   maxStreak: 0,
   lastCompletedSession: null,
+  hasSavedSession: false,
 
   setConfig: (partial) => {
     set((state) => ({
@@ -79,6 +89,7 @@ export const useDrillStore = create<DrillState>((set, get) => ({
       isInputErrorShake: false,
       streak: 0,
       maxStreak: 0,
+      hasSavedSession: false,
     });
   },
 
@@ -149,14 +160,15 @@ export const useDrillStore = create<DrillState>((set, get) => ({
 
     // Cari token berikutnya yang belum dijawab
     let nextIndex = state.activeTokenIndex + 1;
-    if (nextIndex < 10 && updatedTokens[nextIndex].userAnswer !== undefined) {
+    const tokenCount = currentQ.tokens.length;
+    if (nextIndex < tokenCount && updatedTokens[nextIndex].userAnswer !== undefined) {
       const firstUnanswered = updatedTokens.findIndex((t) => t.userAnswer === undefined);
       if (firstUnanswered !== -1) {
         nextIndex = firstUnanswered;
       }
     }
 
-    if (nextIndex < 10) {
+    if (nextIndex < tokenCount) {
       set({
         questions: updatedQuestions,
         activeTokenIndex: nextIndex,
@@ -215,7 +227,7 @@ export const useDrillStore = create<DrillState>((set, get) => ({
       isCompleted: true,
     };
 
-    const isLastQuestion = state.currentQuestionIndex >= 9;
+    const isLastQuestion = state.currentQuestionIndex >= state.questions.length - 1;
 
     if (!isLastQuestion) {
       playSound('next', state.config.soundEnabled);
@@ -274,7 +286,7 @@ export const useDrillStore = create<DrillState>((set, get) => ({
 
       const summary: SessionSummary = {
         totalDurationMs: totalDuration,
-        averageDurationPerQuestionMs: Math.round(totalDuration / 10),
+        averageDurationPerQuestionMs: Math.round(totalDuration / Math.max(1, updatedQuestions.length)),
         totalTokens,
         correctTokens,
         accuracyPercentage: Math.round(accuracy * 10) / 10,
@@ -306,18 +318,26 @@ export const useDrillStore = create<DrillState>((set, get) => ({
           // Graceful fallback
         });
 
+      // Hapus sesi tersimpan karena sudah selesai
+      try {
+        localStorage.removeItem(SAVED_SESSION_KEY);
+      } catch {
+        // safe fallback
+      }
+
       set({
         questions: updatedQuestions,
         status: 'finished',
         lastCompletedSession: sessionRecord,
         currentInput: '',
+        hasSavedSession: false,
       });
     }
   },
 
   pauseSession: () => {
     if (get().status === 'running') {
-      set({ status: 'paused' });
+      set({ status: 'paused', hasSavedSession: true });
     }
   },
 
@@ -328,6 +348,11 @@ export const useDrillStore = create<DrillState>((set, get) => ({
   },
 
   resetSession: () => {
+    try {
+      localStorage.removeItem(SAVED_SESSION_KEY);
+    } catch {
+      // safe fallback
+    }
     set({
       status: 'idle',
       questions: [],
@@ -338,7 +363,17 @@ export const useDrillStore = create<DrillState>((set, get) => ({
       streak: 0,
       maxStreak: 0,
       lastCompletedSession: null,
+      hasSavedSession: false,
     });
+  },
+
+  clearSavedSession: () => {
+    try {
+      localStorage.removeItem(SAVED_SESSION_KEY);
+    } catch {
+      // safe fallback
+    }
+    set({ hasSavedSession: false });
   },
 
   retryMistakes: () => {
@@ -363,11 +398,15 @@ export const useDrillStore = create<DrillState>((set, get) => ({
 
     if (mistakeTokens.length === 0) return;
 
-    // Buat 100 token dari token yang salah (diulang jika kurang)
+    const totalQuestions = session.questions.length || 10;
+    const tokensPerQuestion = session.questions[0]?.tokens.length || 12;
+    const totalNeeded = totalQuestions * tokensPerQuestion;
+
+    // Buat token dari token yang salah (diulang jika kurang)
     const newTokens: typeof mistakeTokens = [];
-    while (newTokens.length < 100) {
+    while (newTokens.length < totalNeeded) {
       for (let i = 0; i < mistakeTokens.length; i++) {
-        if (newTokens.length < 100) {
+        if (newTokens.length < totalNeeded) {
           newTokens.push({
             ...mistakeTokens[i],
             id: `retry_${Date.now()}_${newTokens.length}`,
@@ -379,10 +418,10 @@ export const useDrillStore = create<DrillState>((set, get) => ({
     }
 
     const questions: Question[] = [];
-    for (let q = 0; q < 10; q++) {
+    for (let q = 0; q < totalQuestions; q++) {
       questions.push({
         questionNumber: q + 1,
-        tokens: newTokens.slice(q * 10, q * 10 + 10),
+        tokens: newTokens.slice(q * tokensPerQuestion, q * tokensPerQuestion + tokensPerQuestion),
         durationMs: 0,
         isCompleted: false,
       });
@@ -397,6 +436,33 @@ export const useDrillStore = create<DrillState>((set, get) => ({
       isInputErrorShake: false,
       streak: 0,
       maxStreak: 0,
+      hasSavedSession: false,
     });
   },
-}));
+}),
+  {
+    name: SAVED_SESSION_KEY,
+    storage: createJSONStorage(() => localStorage),
+    // Only persist session-critical fields — skip ephemeral UI state
+    partialize: (state) => ({
+      status: state.status === 'finished' ? 'idle' : state.status,
+      config: state.config,
+      questions: state.status === 'idle' || state.status === 'finished' ? [] : state.questions,
+      currentQuestionIndex: state.currentQuestionIndex,
+      activeTokenIndex: state.activeTokenIndex,
+      streak: state.streak,
+      maxStreak: state.maxStreak,
+      hasSavedSession: state.hasSavedSession,
+    }),
+    // Normalize running -> paused on hydration so session resumes in controlled state
+    onRehydrateStorage: () => (state) => {
+      if (state && state.status === 'running') {
+        state.status = 'paused';
+        state.hasSavedSession = true;
+      }
+      if (state && state.status === 'paused' && state.questions.length > 0) {
+        state.hasSavedSession = true;
+      }
+    },
+  }
+));

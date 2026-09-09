@@ -101,14 +101,14 @@ export const DrillRoot: React.FC<DrillRootProps> = ({ children }) => {
   const tokens = currentQ ? currentQ.tokens : [];
   const currentToken = tokens[activeTokenIndex];
   const answeredCount = tokens.filter((t) => t.userAnswer !== undefined).length;
-  const isAllAnswered = answeredCount === 10;
-  const isLastQuestion = currentQuestionIndex === 9;
+  const isAllAnswered = answeredCount === tokens.length && tokens.length > 0;
+  const isLastQuestion = currentQuestionIndex === (questions.length > 0 ? questions.length - 1 : 9);
 
   const contextValue: DrillContextValue = useMemo(
     () => ({
       state: {
         currentQuestion: currentQuestionIndex + 1,
-        totalQuestions: 10,
+        totalQuestions: questions.length || 10,
         currentQuestionIndex,
         activeTokenIndex,
         currentInput,
@@ -285,7 +285,7 @@ export const DrillTokenGrid: React.FC = () => {
   const { state, actions } = useDrillContext();
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 md:gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
       {state.tokens.map((token, idx) => (
         <TokenCard
           key={token.id || idx}
@@ -338,7 +338,7 @@ export const DrillInputBar: React.FC = () => {
       }
     } else if (e.key === 'Tab') {
       e.preventDefault();
-      const nextIdx = (state.activeTokenIndex + 1) % 10;
+      const nextIdx = (state.activeTokenIndex + 1) % (state.tokens.length || 12);
       actions.selectToken(nextIdx);
     }
   };
@@ -347,19 +347,19 @@ export const DrillInputBar: React.FC = () => {
     <div className="sticky bottom-4 z-40 bg-white/90 dark:bg-zinc-900/90 border border-zinc-200/90 dark:border-zinc-800/90 rounded-2xl p-4 shadow-2xl backdrop-blur-xl">
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         {/* Active Target Kana Preview */}
-        <div className="flex items-center gap-3 px-3.5 py-2 bg-zinc-100/90 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800/80 rounded-xl shrink-0">
+        {/* <div className="flex items-center gap-3 px-3.5 py-2 bg-zinc-100/90 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800/80 rounded-xl shrink-0">
           <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 font-mono">
             #{state.activeTokenIndex + 1}:
           </span>
-          <span className="font-japanese text-2xl font-black text-indigo-600 dark:text-indigo-400">
+          <span className="font-japanese text-2xl font-black text-indigo-600 dark:text-indigo-400 whitespace-nowrap">
             {state.currentToken?.kanaText}
           </span>
           {state.currentToken?.meaning ? (
-            <span className="text-xs text-zinc-500 dark:text-zinc-400 hidden md:inline font-medium">
+            <span className="text-xs text-zinc-500 dark:text-zinc-400 hidden md:inline font-medium truncate max-w-[140px]">
               ({state.currentToken.meaning})
             </span>
           ) : null}
-        </div>
+        </div> */}
 
         {/* Input Kolom Romaji */}
         <div className="relative flex-1">
@@ -377,7 +377,7 @@ export const DrillInputBar: React.FC = () => {
             className={cn(
               'h-12 text-base font-mono bg-zinc-50/80 dark:bg-zinc-950/90 border-zinc-300 dark:border-zinc-700/80 pr-14 focus-visible:ring-indigo-500 text-zinc-900 dark:text-zinc-100 shadow-inner',
               state.isInputErrorShake &&
-                'animate-shake border-rose-500 text-rose-600 dark:border-rose-500/80 dark:text-rose-300'
+              'animate-shake border-rose-500 text-rose-600 dark:border-rose-500/80 dark:text-rose-300'
             )}
           />
           <button
@@ -422,7 +422,7 @@ export const DrillInputBar: React.FC = () => {
           <span>
             Terjawab:{' '}
             <strong className="text-zinc-900 dark:text-zinc-200 font-mono">
-              {state.answeredCount} / 10
+              {state.answeredCount} / {state.tokens.length || 12}
             </strong>
           </span>
           <span>•</span>

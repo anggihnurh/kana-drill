@@ -373,18 +373,18 @@ export const ResultTimelineChart: React.FC = () => {
               {/* Expanded Tokens Grid */}
               {isExpanded ? (
                 <div className="mt-3 p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl animate-pop-in">
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                     {q.tokens.map((t, tIdx) => (
                       <div
                         key={tIdx}
                         className={cn(
-                          'p-2.5 rounded-lg border text-center text-xs',
+                          'p-2.5 rounded-lg border text-center text-xs overflow-hidden',
                           t.isCorrect
                             ? 'bg-emerald-50/70 border-emerald-200 text-emerald-900 dark:bg-emerald-950/30 dark:border-emerald-800/50 dark:text-emerald-200'
                             : 'bg-rose-50/70 border-rose-200 text-rose-900 dark:bg-rose-950/30 dark:border-rose-800/50 dark:text-rose-200'
                         )}
                       >
-                        <div className="font-japanese text-base font-bold">
+                        <div className="font-japanese text-base font-bold whitespace-nowrap truncate" title={t.kanaText}>
                           {t.kanaText}
                         </div>
                         <div className="font-mono text-[11px] truncate mt-0.5 font-semibold">
@@ -413,7 +413,7 @@ export const ResultTimelineChart: React.FC = () => {
 // ==========================================
 export const ResultMistakesReview: React.FC = () => {
   const { state, actions } = useResultContext();
-  const { mistakes, hasMistakes } = state;
+  const { mistakes, hasMistakes, summary } = state;
 
   return (
     <Card className="p-5 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
@@ -452,11 +452,11 @@ export const ResultMistakesReview: React.FC = () => {
               className="p-3 bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800/80 rounded-xl flex items-center justify-between gap-3 shadow-inner"
             >
               <div>
-                <span className="font-japanese text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+                <span className="font-japanese text-2xl font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap block" title={m.kanaText}>
                   {m.kanaText}
                 </span>
                 {m.meaning ? (
-                  <span className="text-xs text-zinc-500 block">{m.meaning}</span>
+                  <span className="text-xs text-zinc-500 block truncate max-w-[150px]">{m.meaning}</span>
                 ) : null}
                 <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-mono">
                   Soal #{m.questionIndex} • Token #{m.tokenIndex}
@@ -475,7 +475,7 @@ export const ResultMistakesReview: React.FC = () => {
         </div>
       ) : (
         <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-          Luar biasa! Seluruh 100 token kana dijawab dengan benar tanpa ada kesalahan transliterasi Romaji.
+          Luar biasa! Seluruh {summary.totalTokens} token kana dijawab dengan benar tanpa ada kesalahan transliterasi Romaji.
         </p>
       )}
     </Card>

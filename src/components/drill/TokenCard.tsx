@@ -37,7 +37,7 @@ export const TokenCard: React.FC<TokenCardProps> = React.memo(
       <div
         onClick={onClick}
         className={cn(
-          'relative flex flex-col items-center justify-between p-3.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-200 select-none border',
+          'relative flex flex-col items-center justify-between min-h-[145px] sm:min-h-[160px] p-4 sm:p-4.5 rounded-2xl cursor-pointer transition-all duration-200 select-none border',
           'active:scale-[0.97]',
           // Default unvisited state
           'bg-white dark:bg-zinc-900/80 border-zinc-200/90 dark:border-zinc-800/80 text-zinc-900 dark:text-zinc-100 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-sm hover:shadow-md',
@@ -86,13 +86,23 @@ export const TokenCard: React.FC<TokenCardProps> = React.memo(
           )}
         </div>
 
-        {/* Japanese Kana Text Display */}
-        <div className="my-2 sm:my-3 text-center w-full px-1">
-          <span className="font-japanese text-3xl sm:text-4xl lg:text-5xl font-bold tracking-wider leading-none block drop-shadow-sm">
+        {/* Japanese Kana Text Display - Single Line */}
+        <div className="my-2 sm:my-3 text-center w-full px-1 overflow-hidden flex flex-col items-center justify-center min-h-[48px] sm:min-h-[56px]">
+          <span
+            className={cn(
+              'font-japanese font-bold leading-none block drop-shadow-sm whitespace-nowrap max-w-full truncate',
+              token.kanaText.length <= 1 && 'text-3xl sm:text-4xl lg:text-5xl tracking-wider',
+              token.kanaText.length === 2 && 'text-2xl sm:text-3xl lg:text-4xl tracking-wider',
+              token.kanaText.length === 3 && 'text-xl sm:text-2xl lg:text-3xl tracking-normal',
+              token.kanaText.length === 4 && 'text-lg sm:text-xl lg:text-2xl tracking-tight',
+              token.kanaText.length >= 5 && 'text-base sm:text-lg lg:text-xl tracking-tight'
+            )}
+            title={token.kanaText}
+          >
             {token.kanaText}
           </span>
           {token.meaning ? (
-            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1.5 line-clamp-1 italic max-w-[130px] mx-auto">
+            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1.5 truncate max-w-full italic px-1">
               {token.meaning}
             </p>
           ) : null}
