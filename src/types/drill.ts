@@ -46,9 +46,12 @@ export interface Question {
   isCompleted: boolean;
 }
 
+export type InputMode = 'text' | 'voice';
+
 export interface SessionConfig {
   script: KanaScript;
   mode: DrillMode;
+  inputMode: InputMode;
   categories: KanaCategory[];
   soundEnabled: boolean;
 }

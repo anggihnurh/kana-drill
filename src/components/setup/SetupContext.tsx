@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { DrillMode, KanaCategory, KanaScript, SessionConfig, SessionRecord } from '../../types/drill';
+import { DrillMode, InputMode, KanaCategory, KanaScript, SessionConfig, SessionRecord } from '../../types/drill';
 
 export interface SetupState {
   config: SessionConfig;
@@ -14,6 +14,7 @@ export interface SetupActions {
   applyPreset: (presetConfig: Partial<SessionConfig>) => void;
   selectScript: (script: KanaScript) => void;
   selectMode: (mode: DrillMode) => void;
+  selectInputMode: (inputMode: InputMode) => void;
   toggleCategory: (category: KanaCategory) => void;
   selectAllCategories: () => void;
   toggleSound: () => void;

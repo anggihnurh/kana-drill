@@ -185,3 +185,66 @@ export function isRomajiMatch(
 
   return false;
 }
+
+/**
+ * Konversi karakter Hiragana ke Katakana
+ */
+export function hiraganaToKatakana(str: string): string {
+  return str.replace(/[\u3041-\u3096]/g, (ch) =>
+    String.fromCharCode(ch.charCodeAt(0) + 0x60)
+  );
+}
+
+/**
+ * Konversi karakter Katakana ke Hiragana
+ */
+export function katakanaToHiragana(str: string): string {
+  return str.replace(/[\u30a1-\u30f6]/g, (ch) =>
+    String.fromCharCode(ch.charCodeAt(0) - 0x60)
+  );
+}
+
+/**
+ * Validasi apakah ucapan suara pengguna cocok dengan token target
+ */
+export function isVoiceMatch(
+  spokenText: string,
+  expectedList: string[],
+  kanaText: string
+): boolean {
+  if (!spokenText || !spokenText.trim()) return false;
+
+  const cleanSpoken = spokenText
+    .trim()
+    .toLowerCase()
+    .replace(/[。、・\s_.,!?]/g, '');
+  const cleanTarget = kanaText.trim().replace(/[。、・\s_.,!?]/g, '');
+
+  if (!cleanSpoken || !cleanTarget) return false;
+
+  // 1. Cek kecocokan langsung teks kana atau romaji
+  if (isRomajiMatch(cleanSpoken, expectedList, cleanTarget)) {
+    return true;
+  }
+
+  // 2. Cek kesetaraan Hiragana <-> Katakana
+  const spokenHiragana = katakanaToHiragana(cleanSpoken);
+  const targetHiragana = katakanaToHiragana(cleanTarget);
+  if (spokenHiragana === targetHiragana) {
+    return true;
+  }
+
+  const spokenKatakana = hiraganaToKatakana(cleanSpoken);
+  const targetKatakana = hiraganaToKatakana(cleanTarget);
+  if (spokenKatakana === targetKatakana) {
+    return true;
+  }
+
+  // 3. Cek jika suara mengandung target atau sebaliknya (untuk ucapan berantai)
+  if (cleanSpoken.endsWith(targetHiragana) || cleanSpoken.endsWith(targetKatakana)) {
+    return true;
+  }
+
+  return false;
+}
+

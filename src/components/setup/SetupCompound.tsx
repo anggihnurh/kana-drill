@@ -25,6 +25,8 @@ import {
   PlayCircle,
   Trash2,
   Smartphone,
+  Keyboard,
+  Mic,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { usePWAInstall } from '../../hooks/usePWAInstall';
@@ -199,6 +201,14 @@ export const SetupRoot: React.FC<SetupRootProps> = ({ children }) => {
     [config.soundEnabled, setConfig]
   );
 
+  const selectInputMode = useCallback(
+    (inputMode: 'text' | 'voice') => {
+      playSound('click', config.soundEnabled);
+      setConfig({ inputMode });
+    },
+    [config.soundEnabled, setConfig]
+  );
+
   const toggleCategory = useCallback(
     (cat: KanaCategory) => {
       playSound('click', config.soundEnabled);
@@ -254,6 +264,7 @@ export const SetupRoot: React.FC<SetupRootProps> = ({ children }) => {
         applyPreset,
         selectScript,
         selectMode,
+        selectInputMode,
         toggleCategory,
         selectAllCategories,
         toggleSound,
@@ -270,6 +281,7 @@ export const SetupRoot: React.FC<SetupRootProps> = ({ children }) => {
       applyPreset,
       selectScript,
       selectMode,
+      selectInputMode,
       toggleCategory,
       selectAllCategories,
       toggleSound,
@@ -662,10 +674,59 @@ export const SetupSessionOverview: React.FC = () => {
             />
           </button>
         </div>
+
+        {/* Mode Menjawab: Text vs Voice */}
+        <div className="mt-4 space-y-2">
+          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            <span>Mode Menjawab</span>
+            <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold">
+              {state.config.inputMode === 'voice' ? '🎙️ Mode Suara' : '⌨️ Mode Teks'}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onClick={() => actions.selectInputMode('text')}
+              className={cn(
+                'p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all duration-150 cursor-pointer text-center',
+                state.config.inputMode === 'text'
+                  ? 'border-indigo-600 bg-indigo-50/90 text-indigo-950 ring-2 ring-indigo-500/50 shadow-sm dark:border-indigo-500 dark:bg-indigo-950/40 dark:text-white'
+                  : 'border-zinc-200 bg-zinc-50/50 text-zinc-600 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-400 dark:hover:border-zinc-700'
+              )}
+            >
+              <div className="flex items-center gap-1.5 font-bold text-xs">
+                <Keyboard className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span>Ketik (Teks)</span>
+              </div>
+              <span className="text-[10px] text-zinc-500 dark:text-zinc-400">
+                Ketik Romaji via Keyboard
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => actions.selectInputMode('voice')}
+              className={cn(
+                'p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all duration-150 cursor-pointer text-center',
+                state.config.inputMode === 'voice'
+                  ? 'border-rose-600 bg-rose-50/90 text-rose-950 ring-2 ring-rose-500/50 shadow-sm dark:border-rose-500 dark:bg-rose-950/40 dark:text-white'
+                  : 'border-zinc-200 bg-zinc-50/50 text-zinc-600 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-400 dark:hover:border-zinc-700'
+              )}
+            >
+              <div className="flex items-center gap-1.5 font-bold text-xs">
+                <Mic className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                <span>Ucapkan (Suara)</span>
+              </div>
+              <span className="text-[10px] text-zinc-500 dark:text-zinc-400">
+                Ucapkan Kana via Mikrofon
+              </span>
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Action buttons */}
-      <div className="mt-6 space-y-2.5">
+      <div className="mt-5 space-y-2.5">
         <Button
           onClick={actions.startSession}
           size="lg"

@@ -33,7 +33,7 @@ interface DrillState {
   setConfig: (config: Partial<SessionConfig>) => void;
   startSession: (customConfig?: Partial<SessionConfig>) => void;
   setInput: (value: string) => void;
-  submitCurrentToken: () => void;
+  submitCurrentToken: (overrideValue?: string) => void;
   selectToken: (index: number) => void;
   nextQuestion: (durationMs: number) => void;
   pauseSession: () => void;
@@ -46,6 +46,7 @@ interface DrillState {
 export const DEFAULT_CONFIG: SessionConfig = {
   script: 'both',
   mode: 'hybrid',
+  inputMode: 'text',
   categories: ['gojuuon', 'dakuon', 'handakuon', 'youon', 'sokuon', 'chouon', 'tokushuon'],
   soundEnabled: true,
 };
@@ -111,7 +112,7 @@ export const useDrillStore = create<DrillState>()(
     });
   },
 
-  submitCurrentToken: () => {
+  submitCurrentToken: (overrideValue?: string) => {
     const state = get();
     if (state.status !== 'running') return;
 
@@ -121,7 +122,7 @@ export const useDrillStore = create<DrillState>()(
     const currentToken = currentQ.tokens[state.activeTokenIndex];
     if (!currentToken) return;
 
-    const inputVal = state.currentInput.trim();
+    const inputVal = (overrideValue !== undefined ? overrideValue : state.currentInput).trim();
     if (!inputVal) return;
 
     const isCorrect = isRomajiMatch(

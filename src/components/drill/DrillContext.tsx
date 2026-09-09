@@ -20,17 +20,19 @@ export interface DrillState {
   currentToken: TokenItem | undefined;
   cmdKeyText: string;
   soundEnabled: boolean;
+  inputMode: 'text' | 'voice';
 }
 
 export interface DrillActions {
   setInput: (value: string) => void;
-  submitCurrentToken: () => void;
+  submitCurrentToken: (overrideValue?: string) => void;
   selectToken: (index: number) => void;
   nextQuestion: () => void;
   pauseSession: () => void;
   resumeSession: () => void;
   resetSession: () => void;
   toggleSound: () => void;
+  setInputMode: (mode: 'text' | 'voice') => void;
 }
 
 export interface DrillMeta {
