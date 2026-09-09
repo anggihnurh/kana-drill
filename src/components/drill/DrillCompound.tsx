@@ -305,13 +305,63 @@ export const DrillTokenGrid: React.FC = () => {
 export const DrillInputBar: React.FC = () => {
   const { state, actions, meta } = useDrillContext();
 
-  // Ensure active token is visible above keyboard on mobile
+  // Auto-scroll aktif agar token tidak terhalang oleh container input ataupun top header
   useEffect(() => {
-    const activeEl = document.querySelector('[data-token-active="true"]');
-    if (activeEl) {
-      activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const scrollToActiveToken = () => {
+      const activeEl =
+        document.getElementById(`token-card-${state.activeTokenIndex}`) ||
+        document.querySelector('[data-token-active="true"]');
+      if (!activeEl) return;
+
+      const inputBar = document.getElementById('drill-input-bar');
+      const header = document.querySelector('header');
+
+      const tokenRect = activeEl.getBoundingClientRect();
+      const inputBarTop = inputBar
+        ? inputBar.getBoundingClientRect().top
+        : window.innerHeight - 120;
+      const headerBottom = header
+        ? header.getBoundingClientRect().bottom
+        : 60;
+
+      const BOTTOM_MARGIN = 20;
+      const TOP_MARGIN = 16;
+
+      // Jika kartu token terhalang atau berada terlalu dekat di bawah floating input bar
+      if (tokenRect.bottom > inputBarTop - BOTTOM_MARGIN) {
+        const delta = tokenRect.bottom - inputBarTop + BOTTOM_MARGIN;
+        window.scrollBy({ top: delta, behavior: 'smooth' });
+      }
+      // Jika kartu token terhalang di belakang sticky header atas
+      else if (tokenRect.top < headerBottom + TOP_MARGIN) {
+        const delta = tokenRect.top - (headerBottom + TOP_MARGIN);
+        window.scrollBy({ top: delta, behavior: 'smooth' });
+      }
+    };
+
+    // Jalankan auto-scroll setelah render frame
+    const frameId = requestAnimationFrame(() => {
+      scrollToActiveToken();
+    });
+
+    // Dengarkan perubahan ukuran visual viewport (misal keyboard mobile muncul/tutup)
+    const viewport = window.visualViewport;
+    if (viewport) {
+      viewport.addEventListener('resize', scrollToActiveToken);
     }
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      if (viewport) {
+        viewport.removeEventListener('resize', scrollToActiveToken);
+      }
+    };
   }, [state.activeTokenIndex]);
+
+  // Reset scroll ke atas saat berganti soal baru
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [state.currentQuestionIndex]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (state.isPaused) {
@@ -352,23 +402,11 @@ export const DrillInputBar: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 sm:sticky sm:bottom-4 w-full max-w-5xl mx-auto bg-white/95 dark:bg-zinc-900/95 border-t sm:border border-zinc-200/90 dark:border-zinc-800/90 sm:rounded-2xl p-3 sm:p-4 shadow-2xl backdrop-blur-xl transition-all pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+    <div
+      id="drill-input-bar"
+      className="fixed bottom-0 left-0 right-0 z-40 sm:sticky sm:bottom-4 w-full max-w-5xl mx-auto bg-white/95 dark:bg-zinc-900/95 border-t sm:border border-zinc-200/90 dark:border-zinc-800/90 sm:rounded-2xl p-3 sm:p-4 shadow-2xl backdrop-blur-xl transition-all pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+    >
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-        {/* Active Target Kana Preview */}
-        {/* <div className="flex items-center gap-3 px-3.5 py-2 bg-zinc-100/90 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800/80 rounded-xl shrink-0">
-          <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 font-mono">
-            #{state.activeTokenIndex + 1}:
-          </span>
-          <span className="font-japanese text-2xl font-black text-indigo-600 dark:text-indigo-400 whitespace-nowrap">
-            {state.currentToken?.kanaText}
-          </span>
-          {state.currentToken?.meaning ? (
-            <span className="text-xs text-zinc-500 dark:text-zinc-400 hidden md:inline font-medium truncate max-w-[140px]">
-              ({state.currentToken.meaning})
-            </span>
-          ) : null}
-        </div> */}
-
         {/* Input Kolom Romaji */}
         <div className="relative flex-1">
           <Input
