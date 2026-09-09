@@ -305,6 +305,14 @@ export const DrillTokenGrid: React.FC = () => {
 export const DrillInputBar: React.FC = () => {
   const { state, actions, meta } = useDrillContext();
 
+  // Ensure active token is visible above keyboard on mobile
+  useEffect(() => {
+    const activeEl = document.querySelector('[data-token-active="true"]');
+    if (activeEl) {
+      activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [state.activeTokenIndex]);
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (state.isPaused) {
       if (e.key === 'Escape') {
@@ -344,7 +352,7 @@ export const DrillInputBar: React.FC = () => {
   };
 
   return (
-    <div className="sticky bottom-4 z-40 bg-white/90 dark:bg-zinc-900/90 border border-zinc-200/90 dark:border-zinc-800/90 rounded-2xl p-4 shadow-2xl backdrop-blur-xl">
+    <div className="fixed bottom-0 left-0 right-0 z-40 sm:sticky sm:bottom-4 w-full max-w-5xl mx-auto bg-white/95 dark:bg-zinc-900/95 border-t sm:border border-zinc-200/90 dark:border-zinc-800/90 sm:rounded-2xl p-3 sm:p-4 shadow-2xl backdrop-blur-xl transition-all pb-[max(0.75rem,env(safe-area-inset-bottom))]">
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         {/* Active Target Kana Preview */}
         {/* <div className="flex items-center gap-3 px-3.5 py-2 bg-zinc-100/90 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800/80 rounded-xl shrink-0">

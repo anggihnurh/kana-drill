@@ -36,6 +36,7 @@ export const TokenCard: React.FC<TokenCardProps> = React.memo(
     return (
       <div
         onClick={onClick}
+        data-token-active={isActive ? 'true' : 'false'}
         className={cn(
           'relative flex flex-col items-center justify-between min-h-[145px] sm:min-h-[160px] p-4 sm:p-4.5 rounded-2xl cursor-pointer transition-all duration-200 select-none border',
           'active:scale-[0.97]',
