@@ -317,7 +317,7 @@ export const DrillTokenGrid: React.FC = () => {
   const { state, actions } = useDrillContext();
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
       {state.tokens.map((token, idx) => (
         <TokenCard
           key={token.id || idx}
@@ -428,7 +428,7 @@ export const DrillInputBar: React.FC = () => {
       }
     } else if (e.key === 'Tab') {
       e.preventDefault();
-      const nextIdx = (state.activeTokenIndex + 1) % (state.tokens.length || 12);
+      const nextIdx = (state.activeTokenIndex + 1) % (state.tokens.length || 9);
       actions.selectToken(nextIdx);
     }
   };
@@ -648,7 +648,7 @@ export const DrillInputBar: React.FC = () => {
           <span>
             Terjawab:{' '}
             <strong className="text-zinc-900 dark:text-zinc-200 font-mono">
-              {state.answeredCount} / {state.tokens.length || 12}
+              {state.answeredCount} / {state.tokens.length || 9}
             </strong>
           </span>
           <span>•</span>

@@ -400,7 +400,7 @@ export const useDrillStore = create<DrillState>()(
     if (mistakeTokens.length === 0) return;
 
     const totalQuestions = session.questions.length || 10;
-    const tokensPerQuestion = session.questions[0]?.tokens.length || 12;
+    const tokensPerQuestion = session.questions[0]?.tokens.length || 9;
     const totalNeeded = totalQuestions * tokensPerQuestion;
 
     // Buat token dari token yang salah (diulang jika kurang)

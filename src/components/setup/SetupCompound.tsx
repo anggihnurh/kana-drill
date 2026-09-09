@@ -624,13 +624,13 @@ export const SetupSessionOverview: React.FC = () => {
           <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800/80">
             <span className="text-zinc-500 dark:text-zinc-400">Unit per Soal</span>
             <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100">
-              12 Token Kana (4×3 Grid)
+              9 Token Kana
             </span>
           </div>
           <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800/80">
             <span className="text-zinc-500 dark:text-zinc-400">Total Pembacaan</span>
             <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">
-              120 Token Kana
+              90 Token Kana
             </span>
           </div>
           {/* <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800/80">
@@ -771,7 +771,7 @@ export const SetupResumeBanner: React.FC = () => {
 
   const totalQuestions = savedQuestions.length || 10;
   const currentQ = savedQuestions[savedQuestionIndex];
-  const tokenCount = currentQ?.tokens.length || 12;
+  const tokenCount = currentQ?.tokens.length || 9;
   const answeredOnCurrent = currentQ
     ? currentQ.tokens.filter((t) => t.userAnswer !== undefined).length
     : 0;

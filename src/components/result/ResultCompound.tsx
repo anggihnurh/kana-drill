@@ -307,7 +307,7 @@ export const ResultTimelineChart: React.FC = () => {
             Analisis Kecepatan 10 Soal
           </CardTitle>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-            Klik baris soal untuk melihat rincian 10 token dan hasil transliterasi
+            Klik baris soal untuk melihat rincian 9 token dan hasil transliterasi
           </p>
         </div>
       </CardHeader>
@@ -373,7 +373,7 @@ export const ResultTimelineChart: React.FC = () => {
               {/* Expanded Tokens Grid */}
               {isExpanded ? (
                 <div className="mt-3 p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl animate-pop-in">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     {q.tokens.map((t, tIdx) => (
                       <div
                         key={tIdx}
