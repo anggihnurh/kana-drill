@@ -1,30 +1,25 @@
-import React, { useEffect, useRef, useMemo, useCallback } from 'react';
-import { DrillContext, useDrillContext, DrillContextValue } from './DrillContext';
-import { useDrillStore } from '../../store/useDrillStore';
-import { useStopwatch } from '../../hooks/useStopwatch';
-import { LiveTimer } from './LiveTimer';
-import { TokenCard } from './TokenCard';
-import { Progress } from '../ui/progress';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
 import {
   ChevronRight,
   CornerDownLeft,
-  Sparkles,
-  PauseCircle,
-  Volume2,
-  VolumeX,
+  Flame,
   Pause,
+  PauseCircle,
   Play,
   RotateCcw,
-  Flame,
-  Mic,
-  MicOff,
-  Keyboard,
-  AlertCircle,
+  Sparkles,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useStopwatch } from '../../hooks/useStopwatch';
 import { cn } from '../../lib/utils';
-import { useVoiceInput } from '../../hooks/useVoiceInput';
+import { useDrillStore } from '../../store/useDrillStore';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Progress } from '../ui/progress';
+import { DrillContext, DrillContextValue, useDrillContext } from './DrillContext';
+import { LiveTimer } from './LiveTimer';
+import { TokenCard } from './TokenCard';
 
 // ==========================================
 // 1. Drill Root (Provider & Global Shortcuts)
@@ -235,7 +230,7 @@ export const DrillHeaderCompound: React.FC = () => {
             <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
               Soal
             </span>
-            <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400 font-mono">
+            <span className="text-2xl font-black text-zinc-900 dark:text-white font-mono">
               {state.currentQuestion}
             </span>
             <span className="text-xs text-zinc-400 dark:text-zinc-500 font-semibold font-mono">
@@ -274,7 +269,7 @@ export const DrillHeaderCompound: React.FC = () => {
             aria-label="Toggle Suara"
           >
             {state.soundEnabled ? (
-              <Volume2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <Volume2 className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
             ) : (
               <VolumeX className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
             )}
@@ -445,212 +440,78 @@ export const DrillInputBar: React.FC = () => {
 
   const isVoiceMode = state.inputMode === 'voice';
 
-  // Speech Recognition hook untuk Mode Suara
-  const {
-    isSupported: isVoiceSupported,
-    isListening,
-    transcript,
-    interimTranscript,
-    error: voiceError,
-    toggleListening,
-  } = useVoiceInput({
-    currentToken: state.currentToken,
-    isActive: state.isRunning && !state.isPaused && isVoiceMode,
-    onMatch: (spokenText) => {
-      actions.submitCurrentToken(spokenText);
-    },
-  });
-
   return (
     <div
       id="drill-input-bar"
       className="fixed bottom-0 left-0 right-0 z-40 sm:sticky sm:bottom-4 w-full max-w-5xl mx-auto bg-white/95 dark:bg-zinc-900/95 border-t sm:border border-zinc-200/90 dark:border-zinc-800/90 sm:rounded-2xl p-3 sm:p-4 shadow-2xl backdrop-blur-xl transition-all pb-[max(0.75rem,env(safe-area-inset-bottom))]"
     >
-      {isVoiceMode ? (
-        /* ================= VOICE INPUT BAR ================= */
-        <div className="space-y-2.5">
-          {!isVoiceSupported ? (
-            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 rounded-xl flex items-center justify-between gap-3 text-xs text-amber-900 dark:text-amber-200">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-                <span>
-                  Peramban ini tidak mendukung Web Speech API suara. Silakan beralih ke Mode Teks.
-                </span>
-              </div>
-              <Button
-                size="sm"
-                onClick={() => actions.setInputMode('text')}
-                className="shrink-0 h-8 text-xs font-semibold"
-              >
-                Gunakan Keyboard
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-              {/* Mic Status & Live Audio Indicator */}
-              <div className="flex items-center gap-3 flex-1 min-w-0 bg-zinc-50 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 rounded-xl p-2 sm:p-2.5">
-                <button
-                  type="button"
-                  onClick={toggleListening}
-                  className={cn(
-                    'w-11 h-11 shrink-0 rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-md',
-                    isListening
-                      ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-500/30 ring-2 ring-rose-400 animate-pulse'
-                      : 'bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300'
-                  )}
-                  title={isListening ? 'Matikan Mikrofon' : 'Nyalakan Mikrofon'}
-                  aria-label="Toggle Mikrofon"
-                >
-                  {isListening ? (
-                    <Mic className="w-5 h-5 animate-bounce" />
-                  ) : (
-                    <MicOff className="w-5 h-5 text-zinc-400" />
-                  )}
-                </button>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="flex items-center gap-1 text-[11px] font-mono font-bold text-rose-600 dark:text-rose-400">
-                      {isListening ? (
-                        <>
-                          <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping inline-block" />
-                          <span>Mendengarkan...</span>
-                        </>
-                      ) : (
-                        <span className="text-zinc-400">Mikrofon Mati</span>
-                      )}
-                    </span>
-                    <span className="text-xs text-zinc-400">•</span>
-                    <span className="text-xs font-japanese font-bold text-zinc-800 dark:text-zinc-200 truncate">
-                      Ucapkan: <strong className="text-indigo-600 dark:text-indigo-400">{state.currentToken?.kanaText}</strong> ({state.currentToken?.expectedRomaji[0]})
-                    </span>
-                  </div>
-
-                  {/* Speech Transcript Output */}
-                  <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono truncate mt-0.5">
-                    {voiceError ? (
-                      <span className="text-rose-500">{voiceError}</span>
-                    ) : interimTranscript || transcript ? (
-                      <span className="text-zinc-800 dark:text-zinc-200 font-semibold">
-                        🎙️ &ldquo;{interimTranscript || transcript}&rdquo;
-                      </span>
-                    ) : (
-                      <span className="italic text-zinc-400">
-                        {isListening ? 'Ucapkan bunyi kana/kata di atas dengan jelas...' : 'Klik ikon mic untuk mulai bicara'}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Mode Switch & Actions */}
-              <div className="flex items-center gap-2 shrink-0">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => actions.setInputMode('text')}
-                  className="h-11 px-3 text-xs gap-1.5 font-semibold cursor-pointer border-zinc-300 dark:border-zinc-700"
-                  title="Beralih ke mode ketik keyboard"
-                >
-                  <Keyboard className="w-4 h-4 text-zinc-500" />
-                  <span className="hidden md:inline">Mode Teks</span>
-                </Button>
-
-                <Button
-                  onClick={actions.nextQuestion}
-                  variant={state.isAllAnswered ? 'success' : 'default'}
-                  className="h-11 px-5 font-bold shrink-0 gap-2 shadow-md transition-all cursor-pointer"
-                  title={`Lanjut ke soal berikutnya (${state.cmdKeyText})`}
-                >
-                  {state.isLastQuestion ? (
-                    <>
-                      <span>Selesaikan Sesi</span>
-                      <Sparkles className="w-4 h-4" />
-                    </>
-                  ) : (
-                    <>
-                      <span>Selanjutnya</span>
-                      <span className="hidden sm:inline-flex items-center text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/20 dark:bg-black/20 text-white font-semibold">
-                        {state.cmdKeyText}
-                      </span>
-                      <ChevronRight className="w-4 h-4" />
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      ) : (
-        /* ================= KEYBOARD INPUT BAR ================= */
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-          {/* Input Kolom Romaji */}
-          <div className="relative flex-1">
-            <Input
-              ref={meta.inputRef}
-              type="text"
-              value={state.currentInput}
-              onChange={(e) => actions.setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={`Ketik Romaji... Tekan Spasi/Enter`}
-              autoFocus
-              autoComplete="off"
-              autoCapitalize="off"
-              spellCheck="false"
-              className={cn(
-                'h-12 text-base font-mono bg-zinc-50/80 dark:bg-zinc-950/90 border-zinc-300 dark:border-zinc-700/80 pr-14 focus-visible:ring-indigo-500 text-zinc-900 dark:text-zinc-100 shadow-inner',
-                state.isInputErrorShake &&
-                'animate-shake border-rose-500 text-rose-600 dark:border-rose-500/80 dark:text-rose-300'
-              )}
-            />
-            <button
-              type="button"
-              onClick={() => actions.submitCurrentToken()}
-              disabled={!state.currentInput.trim()}
-              className="absolute right-2 top-2 h-8 px-2.5 rounded-lg bg-zinc-200/80 hover:bg-zinc-300 text-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-200 disabled:opacity-20 transition-all flex items-center gap-1 text-xs font-mono font-medium cursor-pointer shadow-sm"
-              title="Submit Token (Spasi / Enter)"
-            >
-              <CornerDownLeft className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Submit</span>
-            </button>
-          </div>
-
-          {/* Quick Switch to Voice Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => actions.setInputMode('voice')}
-            className="h-12 px-3.5 text-xs gap-1.5 font-semibold cursor-pointer border-zinc-300 dark:border-zinc-700 shrink-0"
-            title="Beralih ke mode suara mikrofon"
-          >
-            <Mic className="w-4 h-4 text-rose-500" />
-            <span className="hidden md:inline">Mode Suara</span>
-          </Button>
-
-          {/* Next Question / Finish Action Button */}
-          <Button
-            onClick={actions.nextQuestion}
-            variant={state.isAllAnswered ? 'success' : 'default'}
-            className="h-12 px-5 font-bold shrink-0 gap-2 shadow-md transition-all cursor-pointer"
-            title={`Lanjut ke soal berikutnya (${state.cmdKeyText})`}
-          >
-            {state.isLastQuestion ? (
-              <>
-                <span>Selesaikan Sesi</span>
-                <Sparkles className="w-4 h-4" />
-              </>
-            ) : (
-              <>
-                <span>Selanjutnya</span>
-                <span className="hidden sm:inline-flex items-center text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/20 dark:bg-black/20 text-white font-semibold">
-                  {state.cmdKeyText}
-                </span>
-                <ChevronRight className="w-4 h-4" />
-              </>
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        {/* Input Kolom Romaji */}
+        <div className="relative flex-1">
+          <Input
+            ref={meta.inputRef}
+            type="text"
+            value={state.currentInput}
+            onChange={(e) => actions.setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={`Ketik Romaji... Tekan Spasi/Enter`}
+            autoFocus
+            autoComplete="off"
+            autoCapitalize="off"
+            spellCheck="false"
+            className={cn(
+              'h-12 text-base font-mono bg-zinc-50/80 dark:bg-zinc-950/90 border-zinc-300 dark:border-zinc-700/80 pr-14 focus-visible:ring-zinc-600 dark:focus-visible:ring-zinc-400 text-zinc-900 dark:text-zinc-100 shadow-inner',
+              state.isInputErrorShake &&
+              'animate-shake border-rose-500 text-rose-600 dark:border-rose-500/80 dark:text-rose-300'
             )}
-          </Button>
+          />
+          <button
+            type="button"
+            onClick={() => actions.submitCurrentToken()}
+            disabled={!state.currentInput.trim()}
+            className="absolute right-2 top-2 h-8 px-2.5 rounded-lg bg-zinc-200/80 hover:bg-zinc-300 text-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-200 disabled:opacity-20 transition-all flex items-center gap-1 text-xs font-mono font-medium cursor-pointer shadow-sm"
+            title="Submit Token (Spasi / Enter)"
+          >
+            <CornerDownLeft className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Submit</span>
+          </button>
         </div>
-      )}
+
+        {/* Quick Switch to Voice Button */}
+        {/* <Button
+          variant="outline"
+          size="sm"
+          onClick={() => actions.setInputMode('voice')}
+          className="h-12 px-3.5 text-xs gap-1.5 font-semibold cursor-pointer border-zinc-300 dark:border-zinc-700 shrink-0"
+          title="Beralih ke mode suara mikrofon"
+        >
+          <Mic className="w-4 h-4 text-rose-500" />
+          <span className="hidden md:inline">Mode Suara</span>
+        </Button> */}
+
+        {/* Next Question / Finish Action Button */}
+        <Button
+          onClick={actions.nextQuestion}
+          variant={state.isAllAnswered ? 'success' : 'default'}
+          className="h-12 px-5 font-bold shrink-0 gap-2 shadow-md transition-all cursor-pointer"
+          title={`Lanjut ke soal berikutnya (${state.cmdKeyText})`}
+        >
+          {state.isLastQuestion ? (
+            <>
+              <span>Selesaikan Sesi</span>
+              <Sparkles className="w-4 h-4" />
+            </>
+          ) : (
+            <>
+              <span>Selanjutnya</span>
+              <span className="hidden sm:inline-flex items-center text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/20 dark:bg-black/20 text-white font-semibold">
+                {state.cmdKeyText}
+              </span>
+              <ChevronRight className="w-4 h-4" />
+            </>
+          )}
+        </Button>
+      </div>
 
       {/* Helper Shortcut Bar */}
       <div className="mt-2.5 flex flex-wrap items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 px-1 gap-2">
@@ -682,7 +543,7 @@ export const DrillInputBar: React.FC = () => {
         </div>
         <div className="text-right hidden sm:block text-[11px]">
           <span>
-            <kbd className="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 rounded font-mono text-[10px] text-zinc-700 dark:text-zinc-300 font-semibold text-indigo-600 dark:text-indigo-400">
+            <kbd className="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 rounded font-mono text-[10px] text-zinc-700 dark:text-zinc-300 font-semibold">
               {state.cmdKeyText}
             </kbd>{' '}
             Soal Selanjutnya •{' '}
@@ -744,7 +605,7 @@ export const DrillPauseOverlay: React.FC = () => {
       <Button
         onClick={actions.resumeSession}
         size="lg"
-        className="px-8 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20"
+        className="px-8 font-bold bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 shadow-sm"
       >
         Lanjutkan Pengerjaan (Esc)
       </Button>

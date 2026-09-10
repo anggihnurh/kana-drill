@@ -46,7 +46,7 @@ export const TokenCard: React.FC<TokenCardProps> = React.memo(
           'bg-white dark:bg-zinc-900/80 border-zinc-200/90 dark:border-zinc-800/80 text-zinc-900 dark:text-zinc-100 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-sm hover:shadow-md',
           // Active state (glowing ring)
           isActive &&
-            'ring-2 ring-indigo-500 border-indigo-500 bg-indigo-50/70 text-indigo-950 dark:bg-indigo-950/40 dark:border-indigo-500 dark:ring-indigo-500 dark:text-indigo-100 scale-[1.03] z-10 shadow-lg shadow-indigo-500/10',
+            'ring-2 ring-zinc-900 border-zinc-900 bg-zinc-50 text-zinc-900 dark:bg-zinc-800 dark:border-white dark:ring-white dark:text-white scale-[1.03] z-10 shadow-lg',
           // Correct state
           isAnswered &&
             isCorrect &&
@@ -63,7 +63,7 @@ export const TokenCard: React.FC<TokenCardProps> = React.memo(
             className={cn(
               'font-mono font-bold px-1.5 py-0.5 rounded-md text-[11px] transition-colors',
               isActive
-                ? 'bg-indigo-600 text-white shadow-sm'
+                ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
                 : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800/90 dark:text-zinc-400'
             )}
           >
@@ -127,7 +127,7 @@ export const TokenCard: React.FC<TokenCardProps> = React.memo(
               ) : null}
             </div>
           ) : isActive ? (
-            <span className="text-[11px] font-mono text-indigo-600 dark:text-indigo-400 animate-pulse font-semibold">
+            <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 animate-pulse font-semibold">
               Ketik di sini...
             </span>
           ) : (
@@ -148,7 +148,7 @@ export const TokenCard: React.FC<TokenCardProps> = React.memo(
             'opacity-40 hover:opacity-100 hover:scale-110 active:scale-95',
             isPlaying && 'opacity-100 scale-110',
             isActive
-              ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/60 dark:text-indigo-300'
+              ? 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300'
               : isAnswered && isCorrect
                 ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400'
                 : isAnswered && !isCorrect

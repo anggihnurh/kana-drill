@@ -300,14 +300,14 @@ export const SetupHero: React.FC = () => {
 
   return (
     <div className="text-center space-y-2.5 pt-2">
-      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-semibold tracking-wide mb-1">
+      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-400 text-xs font-semibold tracking-wide mb-1">
         <Sparkles className="w-3.5 h-3.5" />
         <span>Japanese Kana Reflex Trainer</span>
       </div>
 
       <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-zinc-900 dark:text-white flex items-center justify-center gap-3">
         <span>Kana</span>
-        <span className="text-indigo-600 dark:text-indigo-400">Drill</span>
+        <span className="text-zinc-700 dark:text-zinc-300">Drill</span>
         <span className="font-japanese text-3xl sm:text-4xl font-normal text-zinc-400 dark:text-zinc-500">
           かな練習
         </span>
@@ -319,7 +319,7 @@ export const SetupHero: React.FC = () => {
 
       {state.records.length > 0 ? (
         <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
-          <Badge variant="indigo" className="gap-1.5 py-1 px-3 shadow-sm">
+          <Badge variant="default" className="gap-1.5 py-1 px-3 shadow-sm">
             <Layers className="w-3.5 h-3.5" />
             <span>{state.records.length} Sesi Terselesaikan</span>
           </Badge>
@@ -536,12 +536,12 @@ export const SetupCategoryMatrix: React.FC = () => {
     <Card className="p-5">
       <div className="flex items-center justify-between mb-3">
         <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-          3. Cakupan Kategori Kana ({state.config.categories.length}/7 Aktif)
+          Cakupan Kategori Kana ({state.config.categories.length}/7 Aktif)
         </div>
         <button
           type="button"
           onClick={actions.selectAllCategories}
-          className="text-xs text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 font-semibold cursor-pointer"
+          className="text-xs text-zinc-900 hover:text-zinc-700 dark:text-zinc-100 dark:hover:text-zinc-300 font-semibold cursor-pointer underline-offset-2 hover:underline"
         >
           Pilih Semua
         </button>
@@ -550,8 +550,7 @@ export const SetupCategoryMatrix: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         {CATEGORY_DATA.map((cat) => {
           const isChecked = state.config.categories.includes(cat.key);
-          const sampleText =
-            state.config.script === 'katakana' ? cat.sampleKatakana : cat.sampleHiragana;
+          const sampleText = cat.sampleHiragana;
 
           return (
             <button
@@ -561,15 +560,15 @@ export const SetupCategoryMatrix: React.FC = () => {
               className={cn(
                 'flex items-start gap-3 p-3 rounded-xl border text-left transition-all cursor-pointer',
                 isChecked
-                  ? 'border-indigo-500/80 bg-indigo-50/50 text-zinc-900 dark:border-indigo-500/60 dark:bg-indigo-950/30 dark:text-zinc-100 shadow-sm'
-                  : 'border-zinc-200 bg-zinc-50/40 text-zinc-500 hover:border-zinc-300 dark:border-zinc-800/80 dark:bg-zinc-950/30 dark:text-zinc-500 dark:hover:border-zinc-700/60'
+                  ? 'border-zinc-900 bg-white-900 text-white dark:border-zinc-100  dark:text-zinc-900 shadow-sm'
+                  : 'border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-500 dark:hover:border-zinc-700'
               )}
             >
               <div
                 className={cn(
                   'w-4 h-4 mt-0.5 rounded-md flex items-center justify-center text-[10px] font-bold shrink-0 border transition-colors',
                   isChecked
-                    ? 'bg-indigo-600 border-indigo-600 text-white'
+                    ? 'bg-white border-zinc-900 text-zinc-900 dark:bg-zinc-900 dark:border-white dark:text-white'
                     : 'border-zinc-300 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900'
                 )}
               >
@@ -578,14 +577,26 @@ export const SetupCategoryMatrix: React.FC = () => {
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-1">
-                  <span className="text-xs font-bold text-zinc-900 dark:text-zinc-200">
+                  <span className={cn(
+                    'text-xs font-bold',
+                    'text-zinc-900 dark:text-zinc-200',
+                    // isChecked ? 'text-white dark:text-zinc-900' : 'text-zinc-900 dark:text-zinc-200'
+                  )}>
                     {cat.title}
                   </span>
-                  <span className="font-japanese text-[11px] text-indigo-600 dark:text-indigo-400 font-medium truncate max-w-[90px]">
+                  <span className={cn(
+                    'font-japanese text-[11px] font-medium truncate max-w-[90px]',
+                    'text-zinc-500 dark:text-zinc-400',
+                    // isChecked ? 'text-zinc-200 dark:text-zinc-700' : 'text-zinc-500 dark:text-zinc-400'
+                  )}>
                     {sampleText}
                   </span>
                 </div>
-                <div className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+                <div className={cn(
+                  'text-[11px] truncate mt-0.5',
+                  'text-zinc-500 dark:text-zinc-400',
+                  // isChecked ? 'text-zinc-300 dark:text-zinc-600' : 'text-zinc-500 dark:text-zinc-400'
+                )}>
                   {cat.subtitle}
                 </div>
               </div>
@@ -605,7 +616,7 @@ export const SetupSessionOverview: React.FC = () => {
   // const { isInstallable, promptInstall } = usePWAInstall();
 
   return (
-    <Card className="p-5 flex flex-col justify-between h-full bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-lg">
+    <Card className="p-5 flex flex-col justify-between h-full bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
       <div>
         <CardTitle className="text-base text-zinc-900 dark:text-zinc-100 mb-1">
           Spesifikasi Sesi Drill
@@ -629,94 +640,11 @@ export const SetupSessionOverview: React.FC = () => {
           </div>
           <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800/80">
             <span className="text-zinc-500 dark:text-zinc-400">Total Pembacaan</span>
-            <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">
+            <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100">
               90 Token Kana
             </span>
           </div>
-          {/* <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800/80">
-            <span className="text-zinc-500 dark:text-zinc-400">Pengukuran Waktu</span>
-            <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-              Timer per Soal
-            </span>
-          </div> */}
         </div>
-
-        {/* Sound toggle with tactile tester */}
-        {/* <div className="mt-5 p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-950/70 border border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
-          <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
-            {state.config.soundEnabled ? (
-              <Volume2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            ) : (
-              <VolumeX className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
-            )}
-            Efek Suara Ketukan
-          </span>
-          <button
-            type="button"
-            onClick={actions.toggleSound}
-            className={cn(
-              'w-10 h-5.5 rounded-full transition-colors relative cursor-pointer',
-              state.config.soundEnabled ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'
-            )}
-            title="Toggle Efek Suara"
-          >
-            <div
-              className={cn(
-                'w-4 h-4 rounded-full bg-white absolute top-0.5 transition-transform shadow-sm',
-                state.config.soundEnabled ? 'right-1' : 'left-1'
-              )}
-            />
-          </button>
-        </div> */}
-
-        {/* Mode Menjawab: Text vs Voice */}
-        {/* <div className="mt-4 space-y-2">
-          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-            <span>Mode Menjawab</span>
-            <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold">
-              {state.config.inputMode === 'voice' ? '🎙️ Mode Suara' : '⌨️ Mode Teks'}
-            </span>
-          </div>
-          <div className="grid grid-cols-2 gap-2.5">
-            <button
-              type="button"
-              onClick={() => actions.selectInputMode('text')}
-              className={cn(
-                'p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all duration-150 cursor-pointer text-center',
-                state.config.inputMode === 'text'
-                  ? 'border-indigo-600 bg-indigo-50/90 text-indigo-950 ring-2 ring-indigo-500/50 shadow-sm dark:border-indigo-500 dark:bg-indigo-950/40 dark:text-white'
-                  : 'border-zinc-200 bg-zinc-50/50 text-zinc-600 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-400 dark:hover:border-zinc-700'
-              )}
-            >
-              <div className="flex items-center gap-1.5 font-bold text-xs">
-                <Keyboard className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <span>Ketik (Teks)</span>
-              </div>
-              <span className="text-[10px] text-zinc-500 dark:text-zinc-400">
-                Ketik Romaji via Keyboard
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => actions.selectInputMode('voice')}
-              className={cn(
-                'p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all duration-150 cursor-pointer text-center',
-                state.config.inputMode === 'voice'
-                  ? 'border-rose-600 bg-rose-50/90 text-rose-950 ring-2 ring-rose-500/50 shadow-sm dark:border-rose-500 dark:bg-rose-950/40 dark:text-white'
-                  : 'border-zinc-200 bg-zinc-50/50 text-zinc-600 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-400 dark:hover:border-zinc-700'
-              )}
-            >
-              <div className="flex items-center gap-1.5 font-bold text-xs">
-                <Mic className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-                <span>Ucapkan (Suara)</span>
-              </div>
-              <span className="text-[10px] text-zinc-500 dark:text-zinc-400">
-                Ucapkan Kana via Mikrofon
-              </span>
-            </button>
-          </div>
-        </div> */}
       </div>
 
       {/* Action buttons */}
@@ -724,9 +652,9 @@ export const SetupSessionOverview: React.FC = () => {
         <Button
           onClick={actions.startSession}
           size="lg"
-          className="w-full font-bold h-12 text-base gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 cursor-pointer"
+          className="w-full font-bold h-12 text-base gap-2 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 shadow-sm cursor-pointer"
         >
-          <Play className="w-4 h-4 fill-white" />
+          <Play className="w-4 h-4 fill-white dark:fill-zinc-900" />
           <span>Mulai Sesi Drill (10 Soal)</span>
         </Button>
 
@@ -739,17 +667,6 @@ export const SetupSessionOverview: React.FC = () => {
             <History className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
             <span>Riwayat & Statistik</span>
           </Button>
-          {/* 
-          {isInstallable ? (
-            <Button
-              variant="outline"
-              onClick={promptInstall}
-              className="w-full h-10 gap-2 text-xs font-semibold border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-indigo-800 dark:text-indigo-300 dark:hover:bg-indigo-950/40 cursor-pointer"
-            >
-              <Smartphone className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span>Pasang Aplikasi (PWA)</span>
-            </Button>
-          ) : null} */}
         </div>
       </div>
     </Card>

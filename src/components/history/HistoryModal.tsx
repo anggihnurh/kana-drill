@@ -69,7 +69,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) =
                 <div className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">
                   Total Waktu
                 </div>
-                <div className="text-lg font-black text-indigo-600 dark:text-indigo-400 font-mono mt-0.5">
+                <div className="text-lg font-black text-zinc-900 dark:text-zinc-100 font-mono mt-0.5">
                   {formatTime(stats.totalTimeMs)}
                 </div>
                 <div className="text-[10px] text-zinc-500">
@@ -119,7 +119,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) =
                     onClick={() => setFilterScript(f.key)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                       filterScript === f.key
-                        ? 'bg-indigo-600 text-white shadow-sm'
+                        ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
                         : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                     }`}
                   >

@@ -41,7 +41,7 @@ export const DrillHeader: React.FC<DrillHeaderProps> = React.memo(
               <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 Soal
               </span>
-              <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400 font-mono">
+              <span className="text-2xl font-black text-zinc-900 dark:text-white font-mono">
                 {currentQuestion}
               </span>
               <span className="text-xs text-zinc-400 dark:text-zinc-500 font-semibold font-mono">
@@ -80,7 +80,7 @@ export const DrillHeader: React.FC<DrillHeaderProps> = React.memo(
               aria-label="Toggle Suara"
             >
               {soundEnabled ? (
-                <Volume2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <Volume2 className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
               ) : (
                 <VolumeX className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
               )}

@@ -54,3 +54,5 @@ Thumbs.db
 test
 prompt.yml
 .vercel
+dist
+dev-dist

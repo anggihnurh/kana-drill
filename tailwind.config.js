@@ -8,26 +8,29 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#09090b', // zinc-950
-        surface: '#121215',
-        'surface-elevated': '#18181b',
-        border: '#27272a', // zinc-800
-        muted: '#71717a', // zinc-500
-        'muted-foreground': '#a1a1aa', // zinc-400
+        // shadcn-style black/white semantic tokens
+        background: '#09090b',
+        surface: '#0a0a0a',
+        'surface-elevated': '#111111',
+        border: '#27272a',
+        muted: '#71717a',
+        'muted-foreground': '#a1a1aa',
+        // Primary = zinc/white (shadcn style — no indigo accent)
         primary: {
-          DEFAULT: '#6366f1', // indigo-500
-          foreground: '#ffffff',
-          hover: '#4f46e5',
-          light: '#818cf8',
+          DEFAULT: '#18181b',   // zinc-900
+          foreground: '#fafafa',
+          hover: '#27272a',
+          light: '#3f3f46',
         },
+        // Semantic state palettes — tetap berwarna
         success: {
-          DEFAULT: '#10b981', // emerald-500
+          DEFAULT: '#10b981',
           foreground: '#ffffff',
           light: '#34d399',
           dark: '#064e3b',
         },
         danger: {
-          DEFAULT: '#f43f5e', // rose-500
+          DEFAULT: '#f43f5e',
           foreground: '#ffffff',
           light: '#fb7185',
           dark: '#4c0519',
@@ -36,7 +39,7 @@ export default {
           DEFAULT: '#f59e0b',
           light: '#fbbf24',
           dark: '#78350f',
-        }
+        },
       },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
@@ -45,8 +48,8 @@ export default {
       },
       keyframes: {
         pulseGlow: {
-          '0%, 100%': { boxShadow: '0 0 15px -3px rgba(99, 102, 241, 0.4)' },
-          '50%': { boxShadow: '0 0 25px 3px rgba(99, 102, 241, 0.7)' },
+          '0%, 100%': { boxShadow: '0 0 15px -3px rgba(255, 255, 255, 0.1)' },
+          '50%': { boxShadow: '0 0 25px 3px rgba(255, 255, 255, 0.18)' },
         },
         emeraldGlow: {
           '0%, 100%': { boxShadow: '0 0 15px -3px rgba(16, 185, 129, 0.3)' },

@@ -200,13 +200,13 @@ export const ResultRankBanner: React.FC = () => {
 
   return (
     <div className="text-center space-y-3 pt-2">
-      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 text-xs font-bold font-mono">
-        <Award className="w-4 h-4 text-indigo-500" />
+      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-400 text-xs font-bold font-mono">
+        <Award className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
         <span>Sesi 10 Soal Selesai</span>
       </div>
 
       <div className="flex items-center justify-center gap-3">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-3xl font-black shadow-lg shadow-indigo-500/30 font-mono">
+        <div className="w-14 h-14 rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center text-3xl font-black shadow-lg font-mono">
           {rank.grade}
         </div>
         <div className="text-left">
@@ -252,10 +252,10 @@ export const ResultMetricsGrid: React.FC = () => {
 
       <Card className="p-4 bg-white dark:bg-zinc-900/90 border-zinc-200 dark:border-zinc-800 shadow-sm">
         <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-wider mb-2">
-          <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+          <Clock className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
           <span>Total Waktu</span>
         </div>
-        <div className="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-300 font-mono">
+        <div className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-zinc-100 font-mono">
           {formatTime(summary.totalDurationMs)}
         </div>
         <div className="text-[11px] text-zinc-500 mt-1">
@@ -437,7 +437,7 @@ export const ResultMistakesReview: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={actions.retryMistakes}
-            className="text-xs border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-indigo-700 dark:text-indigo-300 dark:hover:bg-indigo-950/40 cursor-pointer font-semibold"
+            className="text-xs cursor-pointer font-semibold"
           >
             Latih {mistakes.length} Token Ini Saja
           </Button>
@@ -494,9 +494,9 @@ export const ResultActions: React.FC = () => {
       <Button
         onClick={actions.startSession}
         size="lg"
-        className="w-full sm:w-auto px-8 font-bold h-12 gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 cursor-pointer"
+        className="w-full sm:w-auto px-8 font-bold h-12 gap-2 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 shadow-sm cursor-pointer"
       >
-        <Play className="w-4 h-4 fill-white" />
+        <Play className="w-4 h-4 fill-white dark:fill-zinc-900" />
         <span>Mulai Sesi Baru (10 Soal)</span>
       </Button>
 
