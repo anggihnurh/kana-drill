@@ -19,12 +19,19 @@ export function useVoiceInput({ currentToken, isActive, onMatch }: UseVoiceInput
   const recognitionRef = useRef<any>(null);
   const isManuallyStopped = useRef(false);
   const lastMatchedTokenId = useRef<string | null>(null);
+  const restartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Keep latest refs to avoid stale closures in callbacks
   const currentTokenRef = useRef(currentToken);
   currentTokenRef.current = currentToken;
   const onMatchRef = useRef(onMatch);
   onMatchRef.current = onMatch;
+
+  // Clear live transcripts when token shifts to fresh card
+  useEffect(() => {
+    setTranscript('');
+    setInterimTranscript('');
+  }, [currentToken?.id]);
 
   useEffect(() => {
     // Check Web Speech API support
@@ -42,73 +49,90 @@ export function useVoiceInput({ currentToken, isActive, onMatch }: UseVoiceInput
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = 'ja-JP'; // Optimized for Japanese kana & words recognition
-    recognition.maxAlternatives = 3;
+    recognition.maxAlternatives = 5; // Maximize candidate alternative coverage
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onresult = (event: any) => {
-      let finalStr = '';
-      let interimStr = '';
+      const activeToken = currentTokenRef.current;
+      if (!activeToken) return;
 
+      const candidates: string[] = [];
+      let latestDisplayFinal = '';
+      let latestDisplayInterim = '';
+
+      // Extract all alternatives from the current result segment
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         const result = event.results[i];
-        const text = result[0].transcript;
+        if (!result) continue;
+
+        for (let j = 0; j < result.length; ++j) {
+          const alt = result[j];
+          if (alt && alt.transcript) {
+            const tr = alt.transcript.trim();
+            if (tr) {
+              candidates.push(tr);
+            }
+          }
+        }
+
         if (result.isFinal) {
-          finalStr += text;
+          latestDisplayFinal += result[0]?.transcript || '';
         } else {
-          interimStr += text;
+          latestDisplayInterim += result[0]?.transcript || '';
         }
       }
 
-      const activeToken = currentTokenRef.current;
-      const cleanFinal = finalStr.trim();
-      const cleanInterim = interimStr.trim();
-
-      if (cleanFinal) {
-        setTranscript(cleanFinal);
+      if (latestDisplayFinal.trim()) {
+        setTranscript(latestDisplayFinal.trim());
       }
-      setInterimTranscript(cleanInterim);
+      setInterimTranscript(latestDisplayInterim.trim());
 
-      // Check for match against active target token
-      const candidate = cleanFinal || cleanInterim;
-      if (candidate && activeToken && lastMatchedTokenId.current !== activeToken.id) {
-        const matches = isVoiceMatch(
-          candidate,
-          activeToken.expectedRomaji,
-          activeToken.kanaText
-        );
+      // Evaluate candidates against active target token
+      if (lastMatchedTokenId.current !== activeToken.id) {
+        for (const candidate of candidates) {
+          const matches = isVoiceMatch(
+            candidate,
+            activeToken.expectedRomaji,
+            activeToken.kanaText
+          );
 
-        if (matches) {
-          lastMatchedTokenId.current = activeToken.id;
-          setTranscript(candidate);
-          setInterimTranscript('');
-          onMatchRef.current(candidate);
+          if (matches) {
+            lastMatchedTokenId.current = activeToken.id;
+            setTranscript(candidate);
+            setInterimTranscript('');
+            onMatchRef.current(candidate);
+            break;
+          }
         }
       }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onerror = (event: any) => {
-      // Ignore routine aborts when user navigates or stops
+      // Ignore routine non-fatal aborts or transient silence
       if (event.error === 'aborted' || event.error === 'no-speech') {
         return;
       }
-      console.warn('Speech recognition warning/error:', event.error);
+      console.warn('Speech recognition status:', event.error);
       if (event.error === 'not-allowed') {
-        setError('Izin mikrofon ditolak. Izinkan mikrofon di peramban untuk mode suara.');
+        setError('Izin mikrofon ditolak. Izinkan akses mikrofon di peramban untuk mode suara.');
         setIsListening(false);
-      } else {
+      } else if (event.error !== 'network') {
         setError(`Peringatan suara: ${event.error}`);
       }
     };
 
     recognition.onend = () => {
-      // If still active and not manually stopped, auto-restart to keep listening
+      // If still active and not manually stopped, auto-restart with brief debounce
       if (!isManuallyStopped.current && isActive) {
-        try {
-          recognition.start();
-        } catch {
-          // ignore already started
-        }
+        if (restartTimerRef.current) clearTimeout(restartTimerRef.current);
+        restartTimerRef.current = setTimeout(() => {
+          try {
+            recognition.start();
+          } catch {
+            // safe fallback if already started
+          }
+        }, 80);
       } else {
         setIsListening(false);
       }
@@ -118,6 +142,7 @@ export function useVoiceInput({ currentToken, isActive, onMatch }: UseVoiceInput
 
     return () => {
       isManuallyStopped.current = true;
+      if (restartTimerRef.current) clearTimeout(restartTimerRef.current);
       try {
         recognition.stop();
       } catch {
@@ -142,6 +167,7 @@ export function useVoiceInput({ currentToken, isActive, onMatch }: UseVoiceInput
   const stopListening = useCallback(() => {
     if (!recognitionRef.current) return;
     isManuallyStopped.current = true;
+    if (restartTimerRef.current) clearTimeout(restartTimerRef.current);
     try {
       recognitionRef.current.stop();
     } catch {

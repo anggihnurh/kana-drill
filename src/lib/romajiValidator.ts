@@ -204,47 +204,5 @@ export function katakanaToHiragana(str: string): string {
   );
 }
 
-/**
- * Validasi apakah ucapan suara pengguna cocok dengan token target
- */
-export function isVoiceMatch(
-  spokenText: string,
-  expectedList: string[],
-  kanaText: string
-): boolean {
-  if (!spokenText || !spokenText.trim()) return false;
-
-  const cleanSpoken = spokenText
-    .trim()
-    .toLowerCase()
-    .replace(/[。、・\s_.,!?]/g, '');
-  const cleanTarget = kanaText.trim().replace(/[。、・\s_.,!?]/g, '');
-
-  if (!cleanSpoken || !cleanTarget) return false;
-
-  // 1. Cek kecocokan langsung teks kana atau romaji
-  if (isRomajiMatch(cleanSpoken, expectedList, cleanTarget)) {
-    return true;
-  }
-
-  // 2. Cek kesetaraan Hiragana <-> Katakana
-  const spokenHiragana = katakanaToHiragana(cleanSpoken);
-  const targetHiragana = katakanaToHiragana(cleanTarget);
-  if (spokenHiragana === targetHiragana) {
-    return true;
-  }
-
-  const spokenKatakana = hiraganaToKatakana(cleanSpoken);
-  const targetKatakana = hiraganaToKatakana(cleanTarget);
-  if (spokenKatakana === targetKatakana) {
-    return true;
-  }
-
-  // 3. Cek jika suara mengandung target atau sebaliknya (untuk ucapan berantai)
-  if (cleanSpoken.endsWith(targetHiragana) || cleanSpoken.endsWith(targetKatakana)) {
-    return true;
-  }
-
-  return false;
-}
+export { isVoiceMatch } from './voiceMatcher';
 

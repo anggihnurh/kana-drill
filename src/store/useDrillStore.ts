@@ -8,7 +8,7 @@ import {
   SessionSummary,
 } from '../types/drill';
 import { generateSessionQuestions } from '../lib/drillGenerator';
-import { isRomajiMatch } from '../lib/romajiValidator';
+import { isRomajiMatch, isVoiceMatch } from '../lib/romajiValidator';
 import { playSound } from '../lib/soundEffects';
 import { useHistoryStore } from './useHistoryStore';
 
@@ -138,15 +138,17 @@ export const useDrillStore = create<DrillState>()(
       prevToken.userAnswer === undefined &&
       state.activeTokenIndex !== index
     ) {
-      const isCorrect = isRomajiMatch(
-        pendingInput,
-        prevToken.expectedRomaji,
-        prevToken.kanaText
-      );
+      const isCorrect =
+        isRomajiMatch(pendingInput, prevToken.expectedRomaji, prevToken.kanaText) ||
+        isVoiceMatch(pendingInput, prevToken.expectedRomaji, prevToken.kanaText);
+      const recordedAnswer =
+        isCorrect && !isRomajiMatch(pendingInput, prevToken.expectedRomaji, prevToken.kanaText)
+          ? prevToken.kanaText
+          : pendingInput;
       const updatedTokens = [...currentQ.tokens];
       updatedTokens[state.activeTokenIndex] = {
         ...prevToken,
-        userAnswer: pendingInput,
+        userAnswer: recordedAnswer,
         isCorrect,
       };
       updatedQuestions = [...state.questions];
@@ -178,11 +180,9 @@ export const useDrillStore = create<DrillState>()(
     const inputVal = (overrideValue !== undefined ? overrideValue : state.currentInput).trim();
     if (!inputVal) return;
 
-    const isCorrect = isRomajiMatch(
-      inputVal,
-      currentToken.expectedRomaji,
-      currentToken.kanaText
-    );
+    const isCorrect =
+      isRomajiMatch(inputVal, currentToken.expectedRomaji, currentToken.kanaText) ||
+      isVoiceMatch(inputVal, currentToken.expectedRomaji, currentToken.kanaText);
 
     // Audio & Streak feedback
     const currentStreak = isCorrect ? state.streak + 1 : 0;
@@ -198,11 +198,17 @@ export const useDrillStore = create<DrillState>()(
       playSound('wrong', state.config.soundEnabled);
     }
 
+    // Jika jawaban benar via voice match (misal kanji '猫' -> 'ねこ'), simpan bentuk kana/kata asli
+    const recordedAnswer =
+      isCorrect && !isRomajiMatch(inputVal, currentToken.expectedRomaji, currentToken.kanaText)
+        ? currentToken.kanaText
+        : inputVal;
+
     // Update token immutably
     const updatedTokens = [...currentQ.tokens];
     updatedTokens[state.activeTokenIndex] = {
       ...currentToken,
-      userAnswer: inputVal,
+      userAnswer: recordedAnswer,
       isCorrect,
     };
 
@@ -269,14 +275,16 @@ export const useDrillStore = create<DrillState>()(
     const inputVal = state.currentInput.trim();
 
     if (inputVal && activeToken.userAnswer === undefined) {
-      const isCorrect = isRomajiMatch(
-        inputVal,
-        activeToken.expectedRomaji,
-        activeToken.kanaText
-      );
+      const isCorrect =
+        isRomajiMatch(inputVal, activeToken.expectedRomaji, activeToken.kanaText) ||
+        isVoiceMatch(inputVal, activeToken.expectedRomaji, activeToken.kanaText);
+      const recordedAnswer =
+        isCorrect && !isRomajiMatch(inputVal, activeToken.expectedRomaji, activeToken.kanaText)
+          ? activeToken.kanaText
+          : inputVal;
       updatedTokens[state.activeTokenIndex] = {
         ...activeToken,
-        userAnswer: inputVal,
+        userAnswer: recordedAnswer,
         isCorrect,
       };
     }
