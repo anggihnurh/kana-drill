@@ -123,6 +123,16 @@ export const DrillRoot: React.FC<DrillRootProps> = ({ children }) => {
   const isAllAnswered = answeredCount === tokens.length && tokens.length > 0;
   const isLastQuestion = currentQuestionIndex === (questions.length > 0 ? questions.length - 1 : 9);
 
+  // Auto-advance ke soal berikutnya jika seluruh 9 token pada soal ini selesai terjawab
+  useEffect(() => {
+    if (isRunning && !isPaused && isAllAnswered) {
+      const timer = setTimeout(() => {
+        nextQuestion();
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [isAllAnswered, isRunning, isPaused, nextQuestion]);
+
   const inputMode = useDrillStore((s) => s.config.inputMode);
 
   const setInputMode = useCallback(

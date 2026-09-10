@@ -49,7 +49,7 @@ function shuffleArray<T>(arr: readonly T[]): T[] {
   return result;
 }
 
-const LENGTH_POOL = [2, 2, 3, 3, 4] as const;
+const LENGTH_POOL = [1, 1, 2, 2, 3] as const;
 
 /**
  * Generator token kombinasi huruf acak (2-4 kana)

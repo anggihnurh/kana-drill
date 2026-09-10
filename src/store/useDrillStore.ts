@@ -95,6 +95,29 @@ export const useDrillStore = create<DrillState>()(
   },
 
   setInput: (value: string) => {
+    const state = get();
+    if (state.status !== 'running') return;
+
+    const currentQ = state.questions[state.currentQuestionIndex];
+    if (!currentQ) {
+      set({ currentInput: value, isInputErrorShake: false });
+      return;
+    }
+
+    const currentToken = currentQ.tokens[state.activeTokenIndex];
+    if (!currentToken) {
+      set({ currentInput: value, isInputErrorShake: false });
+      return;
+    }
+
+    const trimmed = value.trim();
+
+    // Instant auto-submit jika input cocok persis dengan romaji kana/kata target
+    if (trimmed && isRomajiMatch(trimmed, currentToken.expectedRomaji, currentToken.kanaText)) {
+      get().submitCurrentToken(trimmed);
+      return;
+    }
+
     set({ currentInput: value, isInputErrorShake: false });
   },
 
@@ -104,8 +127,38 @@ export const useDrillStore = create<DrillState>()(
     const currentQ = state.questions[state.currentQuestionIndex];
     if (!currentQ || index < 0 || index >= currentQ.tokens.length) return;
 
-    const targetToken = currentQ.tokens[index];
+    let updatedQuestions = state.questions;
+    const prevToken = currentQ.tokens[state.activeTokenIndex];
+    const pendingInput = state.currentInput.trim();
+
+    // Jika ada input yang belum di-submit pada token aktif sebelumnya, commit sebelum pindah token
+    if (
+      pendingInput &&
+      prevToken &&
+      prevToken.userAnswer === undefined &&
+      state.activeTokenIndex !== index
+    ) {
+      const isCorrect = isRomajiMatch(
+        pendingInput,
+        prevToken.expectedRomaji,
+        prevToken.kanaText
+      );
+      const updatedTokens = [...currentQ.tokens];
+      updatedTokens[state.activeTokenIndex] = {
+        ...prevToken,
+        userAnswer: pendingInput,
+        isCorrect,
+      };
+      updatedQuestions = [...state.questions];
+      updatedQuestions[state.currentQuestionIndex] = {
+        ...currentQ,
+        tokens: updatedTokens,
+      };
+    }
+
+    const targetToken = updatedQuestions[state.currentQuestionIndex].tokens[index];
     set({
+      questions: updatedQuestions,
       activeTokenIndex: index,
       currentInput: targetToken.userAnswer || '',
       isInputErrorShake: false,
@@ -159,17 +212,30 @@ export const useDrillStore = create<DrillState>()(
       tokens: updatedTokens,
     };
 
-    // Cari token berikutnya yang belum dijawab
-    let nextIndex = state.activeTokenIndex + 1;
+    // Cari token berikutnya yang belum dijawab (dengan wrap-around)
     const tokenCount = currentQ.tokens.length;
-    if (nextIndex < tokenCount && updatedTokens[nextIndex].userAnswer !== undefined) {
-      const firstUnanswered = updatedTokens.findIndex((t) => t.userAnswer === undefined);
-      if (firstUnanswered !== -1) {
-        nextIndex = firstUnanswered;
+    let nextIndex = -1;
+
+    // 1. Cari ke depan dari token saat ini
+    for (let i = state.activeTokenIndex + 1; i < tokenCount; i++) {
+      if (updatedTokens[i].userAnswer === undefined) {
+        nextIndex = i;
+        break;
       }
     }
 
-    if (nextIndex < tokenCount) {
+    // 2. Jika tidak ada di depan, cari dari awal (wrap-around)
+    if (nextIndex === -1) {
+      for (let i = 0; i < state.activeTokenIndex; i++) {
+        if (updatedTokens[i].userAnswer === undefined) {
+          nextIndex = i;
+          break;
+        }
+      }
+    }
+
+    if (nextIndex !== -1) {
+      // Masih ada token yang belum dijawab
       set({
         questions: updatedQuestions,
         activeTokenIndex: nextIndex,
@@ -179,8 +245,10 @@ export const useDrillStore = create<DrillState>()(
         maxStreak: newMaxStreak,
       });
     } else {
+      // Semua token pada soal ini sudah dijawab! Kosongkan input agar tombol Spasi/Enter langsung lanjut ke soal berikutnya
       set({
         questions: updatedQuestions,
+        currentInput: '',
         isInputErrorShake: !isCorrect,
         streak: currentStreak,
         maxStreak: newMaxStreak,
@@ -446,7 +514,7 @@ export const useDrillStore = create<DrillState>()(
     storage: createJSONStorage(() => localStorage),
     // Only persist session-critical fields — skip ephemeral UI state
     partialize: (state) => ({
-      status: state.status === 'finished' ? 'idle' : state.status,
+      status: state.status,
       config: state.config,
       questions: state.status === 'idle' || state.status === 'finished' ? [] : state.questions,
       currentQuestionIndex: state.currentQuestionIndex,
@@ -454,6 +522,7 @@ export const useDrillStore = create<DrillState>()(
       streak: state.streak,
       maxStreak: state.maxStreak,
       hasSavedSession: state.hasSavedSession,
+      lastCompletedSession: state.lastCompletedSession,
     }),
     // Normalize running -> paused on hydration so session resumes in controlled state
     onRehydrateStorage: () => (state) => {
