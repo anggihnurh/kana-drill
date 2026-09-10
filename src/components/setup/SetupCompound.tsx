@@ -1,157 +1,22 @@
 import {
   Award,
-  BookOpen,
-  Check,
-  Flame,
   History,
   Layers,
   Play,
   PlayCircle,
   RotateCcw,
-  Shuffle,
   Sparkles,
-  Trash2,
-  Zap
+  Trash2
 } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { playSound } from '../../lib/soundEffects';
-import { cn } from '../../lib/utils';
 import { useDrillStore } from '../../store/useDrillStore';
 import { useHistoryStore } from '../../store/useHistoryStore';
 import { DrillMode, KanaCategory, KanaScript, SessionConfig } from '../../types/drill';
 import { HistoryModal } from '../history/HistoryModal';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
-import { Card, CardDescription, CardTitle } from '../ui/card';
 import { SetupContext, SetupContextValue, useSetupContext } from './SetupContext';
-
-interface PresetItem {
-  id: string;
-  name: string;
-  badge: string;
-  icon: string;
-  desc: string;
-  config: Partial<SessionConfig>;
-}
-
-const PRESETS: PresetItem[] = [
-  {
-    id: 'hiragana_basic',
-    name: 'Hiragana Dasar',
-    badge: 'Pemula',
-    icon: 'あ',
-    desc: '46 huruf dasar Gojuuon untuk melatih pondasi awal',
-    config: {
-      script: 'hiragana',
-      mode: 'hybrid',
-      categories: ['gojuuon'],
-    },
-  },
-  {
-    id: 'jlpt_n5',
-    name: 'JLPT N5 Core',
-    badge: 'Populer',
-    icon: '🎌',
-    desc: 'Gojuuon, Dakuon & Handakuon dengan kosakata nyata',
-    config: {
-      script: 'hiragana',
-      mode: 'vocab',
-      categories: ['gojuuon', 'dakuon', 'handakuon'],
-    },
-  },
-  {
-    id: 'katakana_master',
-    name: 'Katakana Serapan',
-    badge: 'Menengah',
-    icon: 'ア',
-    desc: 'Katakana, Chouon & Tokushuon serapan asing',
-    config: {
-      script: 'katakana',
-      mode: 'hybrid',
-      categories: ['gojuuon', 'dakuon', 'handakuon', 'chouon', 'tokushuon'],
-    },
-  },
-  {
-    id: 'full_drill',
-    name: 'Master Speed Drill',
-    badge: 'Hardcore',
-    icon: '👑',
-    desc: 'Semua aksara dan 7 kategori kana kombinasi',
-    config: {
-      script: 'both',
-      mode: 'hybrid',
-      categories: [
-        'gojuuon',
-        'dakuon',
-        'handakuon',
-        'youon',
-        'sokuon',
-        'chouon',
-        'tokushuon',
-      ],
-    },
-  },
-];
-
-interface CategoryMeta {
-  key: KanaCategory;
-  title: string;
-  subtitle: string;
-  sampleHiragana: string;
-  sampleKatakana: string;
-}
-
-const CATEGORY_DATA: CategoryMeta[] = [
-  {
-    key: 'gojuuon',
-    title: 'Gojuuon (Dasar)',
-    subtitle: '46 huruf dasar vokal & konsonan',
-    sampleHiragana: 'あ い う え お',
-    sampleKatakana: 'ア イ ウ エ オ',
-  },
-  {
-    key: 'dakuon',
-    title: 'Dakuon (Tenten)',
-    subtitle: 'Konsonan bersuara g, z, d, b',
-    sampleHiragana: 'が ざ だ ば',
-    sampleKatakana: 'ガ ザ ダ バ',
-  },
-  {
-    key: 'handakuon',
-    title: 'Handakuon (Maru)',
-    subtitle: 'Konsonan semi-suara p',
-    sampleHiragana: 'ぱ ぴ ぷ ぺ ぽ',
-    sampleKatakana: 'パ ピ プ ペ ポ',
-  },
-  {
-    key: 'youon',
-    title: 'Youon (Kombinasi)',
-    subtitle: 'Kombinasi kana dengan ya, yu, yo kecil',
-    sampleHiragana: 'きゃ しゅ ちょ',
-    sampleKatakana: 'キャ シュ チョ',
-  },
-  {
-    key: 'sokuon',
-    title: 'Sokuon (Konsonan Ganda)',
-    subtitle: 'Tanda jeda konsonan rangkap (tsu kecil)',
-    sampleHiragana: 'っ (kitte)',
-    sampleKatakana: 'ッ (beddo)',
-  },
-  {
-    key: 'chouon',
-    title: 'Chouon (Vokal Panjang)',
-    subtitle: 'Vokal panjang strip ー atau vokal rangkap',
-    sampleHiragana: 'おう / ああ',
-    sampleKatakana: 'ー (koohii)',
-  },
-  {
-    key: 'tokushuon',
-    title: 'Tokushuon (Serapan Asing)',
-    subtitle: 'Kombinasi modern fa, ti, di, ve, we',
-    sampleHiragana: '—',
-    sampleKatakana: 'ファ ティ ヴェ',
-  },
-];
 
 // ==========================================
 // 1. Setup Root (Provider)
@@ -334,336 +199,32 @@ export const SetupHero: React.FC = () => {
     </div>
   );
 };
-
-// ==========================================
-// 3. Setup Presets
-// ==========================================
-export const SetupPresets: React.FC = () => {
-  const { state, actions } = useSetupContext();
-
-  return (
-    <div className="space-y-2.5">
-      <div className="flex items-center justify-between px-1">
-        <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
-          <Flame className="w-3.5 h-3.5 text-amber-500" />
-          <span>Preset Latihan Cepat</span>
-        </span>
-        <span className="text-[11px] text-zinc-400">Pilih konfigurasi siap pakai</span>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {PRESETS.map((p) => {
-          const isMatch =
-            state.config.script === p.config.script &&
-            state.config.mode === p.config.mode &&
-            state.config.categories.length === p.config.categories?.length &&
-            p.config.categories?.every((c) => state.config.categories.includes(c));
-
-          return (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => actions.applyPreset(p.config)}
-              className={cn(
-                'relative p-3.5 rounded-2xl border text-left transition-all duration-200 cursor-pointer flex flex-col justify-between shadow-sm hover:shadow-md',
-                isMatch
-                  ? 'bg-indigo-50/90 border-indigo-500 ring-2 ring-indigo-500/50 dark:bg-indigo-950/40 dark:border-indigo-500 text-zinc-900 dark:text-zinc-100'
-                  : 'bg-white dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 hover:border-zinc-300 dark:hover:border-zinc-700'
-              )}
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-1.5">
-                  <span className="font-japanese text-xl font-bold text-indigo-600 dark:text-indigo-400">
-                    {p.icon}
-                  </span>
-                  <span
-                    className={cn(
-                      'text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider',
-                      isMatch
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
-                    )}
-                  >
-                    {p.badge}
-                  </span>
-                </div>
-                <div className="font-bold text-sm text-zinc-900 dark:text-white">
-                  {p.name}
-                </div>
-                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 leading-snug">
-                  {p.desc}
-                </p>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
-// ==========================================
-// 4. Setup Script Selector
-// ==========================================
-export const SetupScriptSelector: React.FC = () => {
-  const { state, actions } = useSetupContext();
-
-  return (
-    <Card className="p-5">
-      <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-3 flex items-center justify-between">
-        <span>1. Jenis Aksara Jepang</span>
-        <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">
-          Script
-        </span>
-      </div>
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { key: 'hiragana' as KanaScript, label: 'Hiragana', sub: 'あ い う え お' },
-          { key: 'katakana' as KanaScript, label: 'Katakana', sub: 'ア イ ウ エ オ' },
-          { key: 'both' as KanaScript, label: 'Campuran', sub: 'Hiragana & Katakana' },
-        ].map((item) => {
-          const isSelected = state.config.script === item.key;
-          return (
-            <button
-              key={item.key}
-              type="button"
-              onClick={() => actions.selectScript(item.key)}
-              className={cn(
-                'p-3.5 rounded-xl border text-left transition-all duration-150 cursor-pointer',
-                isSelected
-                  ? 'border-indigo-600 bg-indigo-50 text-zinc-900 ring-2 ring-indigo-500/50 shadow-sm dark:border-indigo-500 dark:bg-indigo-950/40 dark:text-white'
-                  : 'border-zinc-200 bg-zinc-50/50 text-zinc-700 hover:border-zinc-300 hover:bg-zinc-100/70 dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-300 dark:hover:border-zinc-700'
-              )}
-            >
-              <div className="font-bold text-sm flex items-center justify-between">
-                <span>{item.label}</span>
-                {isSelected ? (
-                  <Check className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                ) : null}
-              </div>
-              <div className="font-japanese text-xs text-zinc-500 dark:text-zinc-400 mt-1 truncate">
-                {item.sub}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </Card>
-  );
-};
-
-// ==========================================
-// 5. Setup Mode Selector
-// ==========================================
-export const SetupModeSelector: React.FC = () => {
-  const { state, actions } = useSetupContext();
-
-  return (
-    <Card className="p-5">
-      <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-3 flex items-center justify-between">
-        <span>2. Mode Peracikan Soal</span>
-        <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">
-          Content Engine
-        </span>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {[
-          {
-            key: 'hybrid' as DrillMode,
-            icon: Zap,
-            title: 'Campuran (Hybrid)',
-            desc: 'Kombinasi kata nyata & suku acak',
-          },
-          {
-            key: 'vocab' as DrillMode,
-            icon: BookOpen,
-            title: 'Kosakata Nyata',
-            desc: 'Kamus kosakata Minna no Nihongo',
-          },
-          {
-            key: 'random' as DrillMode,
-            icon: Shuffle,
-            title: 'Huruf Acak',
-            desc: 'Kombinasi acak melatih refleks murni',
-          },
-        ].map((m) => {
-          const Icon = m.icon;
-          const isSelected = state.config.mode === m.key;
-          return (
-            <button
-              key={m.key}
-              type="button"
-              onClick={() => actions.selectMode(m.key)}
-              className={cn(
-                'p-3.5 rounded-xl border text-left transition-all duration-150 cursor-pointer',
-                isSelected
-                  ? 'border-indigo-600 bg-indigo-50 text-zinc-900 ring-2 ring-indigo-500/50 shadow-sm dark:border-indigo-500 dark:bg-indigo-950/40 dark:text-white'
-                  : 'border-zinc-200 bg-zinc-50/50 text-zinc-700 hover:border-zinc-300 hover:bg-zinc-100/70 dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-300 dark:hover:border-zinc-700'
-              )}
-            >
-              <Icon
-                className={cn(
-                  'w-4 h-4 mb-2',
-                  isSelected
-                    ? 'text-indigo-600 dark:text-indigo-400'
-                    : 'text-zinc-400 dark:text-zinc-500'
-                )}
-              />
-              <div className="font-bold text-sm leading-tight flex items-center justify-between">
-                <span>{m.title}</span>
-                {isSelected ? (
-                  <Check className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                ) : null}
-              </div>
-              <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 leading-snug">
-                {m.desc}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </Card>
-  );
-};
-
-// ==========================================
-// 6. Setup Category Matrix
-// ==========================================
-export const SetupCategoryMatrix: React.FC = () => {
-  const { state, actions } = useSetupContext();
-
-  return (
-    <Card className="p-5">
-      <div className="flex items-center justify-between mb-3">
-        <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-          Cakupan Kategori Kana ({state.config.categories.length}/7 Aktif)
-        </div>
-        <button
-          type="button"
-          onClick={actions.selectAllCategories}
-          className="text-xs text-zinc-900 hover:text-zinc-700 dark:text-zinc-100 dark:hover:text-zinc-300 font-semibold cursor-pointer underline-offset-2 hover:underline"
-        >
-          Pilih Semua
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        {CATEGORY_DATA.map((cat) => {
-          const isChecked = state.config.categories.includes(cat.key);
-          const sampleText = cat.sampleHiragana;
-
-          return (
-            <button
-              key={cat.key}
-              type="button"
-              onClick={() => actions.toggleCategory(cat.key)}
-              className={cn(
-                'flex items-start gap-3 p-3 rounded-xl border text-left transition-all cursor-pointer',
-                isChecked
-                  ? 'border-zinc-900 bg-white-900 text-white dark:border-zinc-100  dark:text-zinc-900 shadow-sm'
-                  : 'border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-500 dark:hover:border-zinc-700'
-              )}
-            >
-              <div
-                className={cn(
-                  'w-4 h-4 mt-0.5 rounded-md flex items-center justify-center text-[10px] font-bold shrink-0 border transition-colors',
-                  isChecked
-                    ? 'bg-white border-zinc-900 text-zinc-900 dark:bg-zinc-900 dark:border-white dark:text-white'
-                    : 'border-zinc-300 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900'
-                )}
-              >
-                {isChecked ? '✓' : ''}
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-1">
-                  <span className={cn(
-                    'text-xs font-bold',
-                    'text-zinc-900 dark:text-zinc-200',
-                    // isChecked ? 'text-white dark:text-zinc-900' : 'text-zinc-900 dark:text-zinc-200'
-                  )}>
-                    {cat.title}
-                  </span>
-                  <span className={cn(
-                    'font-japanese text-[11px] font-medium truncate max-w-[90px]',
-                    'text-zinc-500 dark:text-zinc-400',
-                    // isChecked ? 'text-zinc-200 dark:text-zinc-700' : 'text-zinc-500 dark:text-zinc-400'
-                  )}>
-                    {sampleText}
-                  </span>
-                </div>
-                <div className={cn(
-                  'text-[11px] truncate mt-0.5',
-                  'text-zinc-500 dark:text-zinc-400',
-                  // isChecked ? 'text-zinc-300 dark:text-zinc-600' : 'text-zinc-500 dark:text-zinc-400'
-                )}>
-                  {cat.subtitle}
-                </div>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </Card>
-  );
-};
-
 // ==========================================
 // 7. Setup Session Overview & Action
 // ==========================================
 export const SetupSessionOverview: React.FC = () => {
   const { actions } = useSetupContext();
-  // const { isInstallable, promptInstall } = usePWAInstall();
 
   return (
-    <Card className="p-5 flex flex-col justify-between h-full bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
-      <div>
-        <CardTitle className="text-base text-zinc-900 dark:text-zinc-100 mb-1">
-          Spesifikasi Sesi Drill
-        </CardTitle>
-        <CardDescription className="text-xs text-zinc-500">
-          Sesi terstandarisasi untuk metrik kecepatan & akurasi
-        </CardDescription>
+    <div className="flex flex-col items-center gap-3 py-2">
+      <Button
+        onClick={actions.startSession}
+        size="lg"
+        className="w-full max-w-sm font-bold h-12 text-base gap-2 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 shadow-sm cursor-pointer"
+      >
+        <Play className="w-4 h-4 fill-white dark:fill-zinc-900" />
+        <span>Mulai Sesi Drill</span>
+      </Button>
 
-        <div className="space-y-3 mt-4 text-xs text-zinc-700 dark:text-zinc-300">
-          <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800/80">
-            <span className="text-zinc-500 dark:text-zinc-400">Jumlah Soal</span>
-            <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100">
-              10 Halaman
-            </span>
-          </div>
-          <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800/80">
-            <span className="text-zinc-500 dark:text-zinc-400">Unit per Soal</span>
-            <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100">
-              9 Token Kana
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Action buttons */}
-      <div className="mt-5 space-y-2.5">
-        <Button
-          onClick={actions.startSession}
-          size="lg"
-          className="w-full font-bold h-12 text-base gap-2 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 shadow-sm cursor-pointer"
-        >
-          <Play className="w-4 h-4 fill-white dark:fill-zinc-900" />
-          <span>Mulai Sesi Drill (10 Soal)</span>
-        </Button>
-
-        <div>
-          <Button
-            variant="secondary"
-            onClick={() => actions.setIsHistoryOpen(true)}
-            className="w-full h-10 gap-2 text-xs font-semibold cursor-pointer"
-          >
-            <History className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
-            <span>Riwayat & Statistik</span>
-          </Button>
-        </div>
-      </div>
-    </Card>
+      <Button
+        variant="secondary"
+        onClick={() => actions.setIsHistoryOpen(true)}
+        className="w-full max-w-sm h-10 gap-2 text-xs font-semibold cursor-pointer"
+      >
+        <History className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
+        <span>Riwayat & Statistik</span>
+      </Button>
+    </div>
   );
 };
 
@@ -788,9 +349,5 @@ export const Setup = {
   Root: SetupRoot,
   Hero: SetupHero,
   ResumeBanner: SetupResumeBanner,
-  Presets: SetupPresets,
-  ScriptSelector: SetupScriptSelector,
-  ModeSelector: SetupModeSelector,
-  CategoryMatrix: SetupCategoryMatrix,
   SessionOverview: SetupSessionOverview,
 };

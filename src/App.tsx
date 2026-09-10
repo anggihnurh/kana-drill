@@ -52,7 +52,7 @@ export function App() {
       </header>
 
       {/* Main Content Viewport */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-4 py-3 sm:py-6 flex flex-col justify-start sm:justify-center">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-4 py-3 sm:py-6 flex flex-col justify-center sm:justify-center">
         {status === 'idle' ? (
           <SetupScreen />
         ) : status === 'running' || status === 'paused' ? (
