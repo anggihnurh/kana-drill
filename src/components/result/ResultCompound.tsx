@@ -1,30 +1,29 @@
-import React, { useState, useMemo, useCallback } from 'react';
 import {
-  ResultContext,
-  useResultContext,
-  ResultContextValue,
-  PerformanceRank,
-  MistakeItem,
-} from './ResultContext';
-import { useDrillStore } from '../../store/useDrillStore';
-import { Card, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { formatTime, cn } from '../../lib/utils';
-import {
-  RotateCcw,
-  Target,
-  Clock,
-  Zap,
-  CheckCircle2,
   AlertTriangle,
-  Play,
-  Home,
+  Award,
+  Check,
+  CheckCircle2,
   ChevronDown,
   ChevronUp,
+  Clock,
+  Home,
+  Play,
   Share2,
-  Check,
-  Award,
+  Target,
+  Zap
 } from 'lucide-react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { cn, formatTime } from '../../lib/utils';
+import { useDrillStore } from '../../store/useDrillStore';
+import { Button } from '../ui/button';
+import { Card, CardHeader, CardTitle } from '../ui/card';
+import {
+  MistakeItem,
+  PerformanceRank,
+  ResultContext,
+  ResultContextValue,
+  useResultContext,
+} from './ResultContext';
 
 function calculateRank(cpm: number, accuracy: number): PerformanceRank {
   if (cpm >= 200 && accuracy >= 95) {
@@ -343,8 +342,8 @@ export const ResultTimelineChart: React.FC = () => {
                         allTokensCorrect
                           ? 'bg-emerald-500'
                           : q.correctCount >= 8
-                          ? 'bg-amber-500'
-                          : 'bg-rose-500'
+                            ? 'bg-amber-500'
+                            : 'bg-rose-500'
                       )}
                       style={{ width: `${barWidthPercent}%` }}
                     />
@@ -487,7 +486,7 @@ export const ResultMistakesReview: React.FC = () => {
 // ==========================================
 export const ResultActions: React.FC = () => {
   const { state, actions } = useResultContext();
-  const { hasMistakes, isCopied } = state;
+  const { isCopied } = state;
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
@@ -499,7 +498,7 @@ export const ResultActions: React.FC = () => {
         <Play className="w-4 h-4 fill-white dark:fill-zinc-900" />
         <span>Mulai Sesi Baru (10 Soal)</span>
       </Button>
-
+      {/* 
       {hasMistakes ? (
         <Button
           onClick={actions.retryMistakes}
@@ -510,7 +509,7 @@ export const ResultActions: React.FC = () => {
           <RotateCcw className="w-4 h-4 text-amber-500" />
           <span>Latih Ulang Token Salah</span>
         </Button>
-      ) : null}
+      ) : null} */}
 
       <Button
         onClick={actions.shareScore}

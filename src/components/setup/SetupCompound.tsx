@@ -638,12 +638,6 @@ export const SetupSessionOverview: React.FC = () => {
               9 Token Kana
             </span>
           </div>
-          <div className="flex justify-between py-2 border-b border-zinc-100 dark:border-zinc-800/80">
-            <span className="text-zinc-500 dark:text-zinc-400">Total Pembacaan</span>
-            <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100">
-              90 Token Kana
-            </span>
-          </div>
         </div>
       </div>
 
