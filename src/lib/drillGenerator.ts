@@ -130,7 +130,7 @@ export function generateSessionQuestions(config: SessionConfig): Question[] {
   const filteredKana = getFilteredKana(config.script, config.categories);
   const filteredVocab = VOCAB_BY_SCRIPT[config.script] || VOCAB_DATABASE;
 
-  const TOTAL_QUESTIONS = 10;
+  const TOTAL_QUESTIONS = 5;
   const TOKENS_PER_QUESTION = 9;
   const TOTAL_TOKENS_NEEDED = TOTAL_QUESTIONS * TOKENS_PER_QUESTION; // 90 tokens
 
