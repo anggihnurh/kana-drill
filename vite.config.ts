@@ -14,7 +14,7 @@ export default defineConfig({
         name: 'KanaDrill — Japanese Kana Speed & Accuracy Drill',
         short_name: 'KanaDrill',
         description: 'Aplikasi speed drill Hiragana & Katakana untuk melatih refleks membaca cepat dan akurat',
-        theme_color: '#4f46e5',
+        theme_color: '#18181b',
         background_color: '#09090b',
         display: 'standalone',
         orientation: 'portrait',
