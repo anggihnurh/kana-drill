@@ -20,7 +20,6 @@ export interface DrillState {
   currentToken: TokenItem | undefined;
   cmdKeyText: string;
   soundEnabled: boolean;
-  inputMode: 'text' | 'voice';
 }
 
 export interface DrillActions {
@@ -32,7 +31,6 @@ export interface DrillActions {
   resumeSession: () => void;
   resetSession: () => void;
   toggleSound: () => void;
-  setInputMode: (mode: 'text' | 'voice') => void;
 }
 
 export interface DrillMeta {

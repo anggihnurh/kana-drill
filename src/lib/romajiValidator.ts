@@ -204,5 +204,3 @@ export function katakanaToHiragana(str: string): string {
   );
 }
 
-export { isVoiceMatch } from './voiceMatcher';
-

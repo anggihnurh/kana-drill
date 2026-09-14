@@ -12,7 +12,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { playSound } from '../../lib/soundEffects';
 import { useDrillStore } from '../../store/useDrillStore';
 import { useHistoryStore } from '../../store/useHistoryStore';
-import { DrillMode, KanaCategory, KanaScript, SessionConfig } from '../../types/drill';
 import { HistoryModal } from '../history/HistoryModal';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -35,67 +34,6 @@ export const SetupRoot: React.FC<SetupRootProps> = ({ children }) => {
 
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const bestRecord = useMemo(() => getBestRecord(), [records, getBestRecord]);
-
-  const applyPreset = useCallback(
-    (presetConfig: Partial<SessionConfig>) => {
-      playSound('click', config.soundEnabled);
-      setConfig(presetConfig);
-    },
-    [config.soundEnabled, setConfig]
-  );
-
-  const selectScript = useCallback(
-    (script: KanaScript) => {
-      playSound('click', config.soundEnabled);
-      setConfig({ script });
-    },
-    [config.soundEnabled, setConfig]
-  );
-
-  const selectMode = useCallback(
-    (mode: DrillMode) => {
-      playSound('click', config.soundEnabled);
-      setConfig({ mode });
-    },
-    [config.soundEnabled, setConfig]
-  );
-
-  const selectInputMode = useCallback(
-    (inputMode: 'text' | 'voice') => {
-      playSound('click', config.soundEnabled);
-      setConfig({ inputMode });
-    },
-    [config.soundEnabled, setConfig]
-  );
-
-  const toggleCategory = useCallback(
-    (cat: KanaCategory) => {
-      playSound('click', config.soundEnabled);
-      const current = config.categories;
-      if (current.includes(cat)) {
-        if (current.length === 1) return;
-        setConfig({ categories: current.filter((c) => c !== cat) });
-      } else {
-        setConfig({ categories: [...current, cat] });
-      }
-    },
-    [config.categories, config.soundEnabled, setConfig]
-  );
-
-  const selectAllCategories = useCallback(() => {
-    playSound('click', config.soundEnabled);
-    setConfig({
-      categories: [
-        'gojuuon',
-        'dakuon',
-        'handakuon',
-        'youon',
-        'sokuon',
-        'chouon',
-        'tokushuon',
-      ],
-    });
-  }, [config.soundEnabled, setConfig]);
 
   const toggleSound = useCallback(() => {
     const next = !config.soundEnabled;
@@ -120,12 +58,6 @@ export const SetupRoot: React.FC<SetupRootProps> = ({ children }) => {
       actions: {
         setConfig,
         startSession,
-        applyPreset,
-        selectScript,
-        selectMode,
-        selectInputMode,
-        toggleCategory,
-        selectAllCategories,
         toggleSound,
         setIsHistoryOpen,
       },
@@ -137,12 +69,6 @@ export const SetupRoot: React.FC<SetupRootProps> = ({ children }) => {
       isHistoryOpen,
       setConfig,
       startSession,
-      applyPreset,
-      selectScript,
-      selectMode,
-      selectInputMode,
-      toggleCategory,
-      selectAllCategories,
       toggleSound,
     ]
   );

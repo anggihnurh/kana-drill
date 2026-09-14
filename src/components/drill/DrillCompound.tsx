@@ -128,15 +128,6 @@ export const DrillRoot: React.FC<DrillRootProps> = ({ children }) => {
     }
   }, [isAllAnswered, isRunning, isPaused, nextQuestion]);
 
-  const inputMode = useDrillStore((s) => s.config.inputMode);
-
-  const setInputMode = useCallback(
-    (mode: 'text' | 'voice') => {
-      setConfig({ inputMode: mode });
-    },
-    [setConfig]
-  );
-
   const contextValue: DrillContextValue = useMemo(
     () => ({
       state: {
@@ -158,7 +149,6 @@ export const DrillRoot: React.FC<DrillRootProps> = ({ children }) => {
         currentToken,
         cmdKeyText,
         soundEnabled,
-        inputMode,
       },
       actions: {
         setInput,
@@ -169,7 +159,6 @@ export const DrillRoot: React.FC<DrillRootProps> = ({ children }) => {
         resumeSession,
         resetSession,
         toggleSound,
-        setInputMode,
       },
       meta: {
         inputRef,
@@ -192,7 +181,6 @@ export const DrillRoot: React.FC<DrillRootProps> = ({ children }) => {
       currentToken,
       cmdKeyText,
       soundEnabled,
-      inputMode,
       setInput,
       submitCurrentToken,
       selectToken,
@@ -201,7 +189,6 @@ export const DrillRoot: React.FC<DrillRootProps> = ({ children }) => {
       resumeSession,
       resetSession,
       toggleSound,
-      setInputMode,
     ]
   );
 
@@ -438,8 +425,6 @@ export const DrillInputBar: React.FC = () => {
     }
   };
 
-  const isVoiceMode = state.inputMode === 'voice';
-
   return (
     <div
       id="drill-input-bar"
@@ -477,18 +462,6 @@ export const DrillInputBar: React.FC = () => {
           </button>
         </div>
 
-        {/* Quick Switch to Voice Button */}
-        {/* <Button
-          variant="outline"
-          size="sm"
-          onClick={() => actions.setInputMode('voice')}
-          className="h-12 px-3.5 text-xs gap-1.5 font-semibold cursor-pointer border-zinc-300 dark:border-zinc-700 shrink-0"
-          title="Beralih ke mode suara mikrofon"
-        >
-          <Mic className="w-4 h-4 text-rose-500" />
-          <span className="hidden md:inline">Mode Suara</span>
-        </Button> */}
-
         {/* Next Question / Finish Action Button */}
         <Button
           onClick={actions.nextQuestion}
@@ -524,21 +497,15 @@ export const DrillInputBar: React.FC = () => {
           </span>
           <span>•</span>
           <span className="hidden sm:inline">
-            {isVoiceMode ? (
-              <span>Ucapkan kata/kana langsung • Suara terdeteksi otomatis submit</span>
-            ) : (
-              <>
-                Tekan{' '}
-                <kbd className="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 rounded font-mono text-[10px] text-zinc-700 dark:text-zinc-300">
-                  Spasi
-                </kbd>{' '}
-                atau{' '}
-                <kbd className="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 rounded font-mono text-[10px] text-zinc-700 dark:text-zinc-300">
-                  Enter
-                </kbd>{' '}
-                untuk submit token
-              </>
-            )}
+            Tekan{' '}
+            <kbd className="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 rounded font-mono text-[10px] text-zinc-700 dark:text-zinc-300">
+              Spasi
+            </kbd>{' '}
+            atau{' '}
+            <kbd className="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 rounded font-mono text-[10px] text-zinc-700 dark:text-zinc-300">
+              Enter
+            </kbd>{' '}
+            untuk submit token
           </span>
         </div>
         <div className="text-right hidden sm:block text-[11px]">
