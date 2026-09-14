@@ -171,14 +171,16 @@ export const SetupSessionOverview: React.FC = () => {
         <span>Mulai Sesi Drill Solo</span>
       </Button>
 
-      <Button
-        variant="outline"
-        onClick={() => actions.setIsRaceLobbyOpen(true)}
-        className="w-full max-w-sm h-11 gap-2 text-xs font-bold border-amber-500/40 hover:bg-amber-500/10 text-amber-600 dark:text-amber-400 cursor-pointer shadow-sm"
-      >
-        <Zap className="w-4 h-4 fill-amber-500 text-amber-500" />
-        <span>Balapan Online (1v1 TypeRacer)</span>
-      </Button>
+      {import.meta.env.DEV && (
+        <Button
+          variant="outline"
+          onClick={() => actions.setIsRaceLobbyOpen(true)}
+          className="w-full max-w-sm h-11 gap-2 text-xs font-bold border-amber-500/40 hover:bg-amber-500/10 text-amber-600 dark:text-amber-400 cursor-pointer shadow-sm"
+        >
+          <Zap className="w-4 h-4 fill-amber-500 text-amber-500" />
+          <span>Balapan Online (1v1 TypeRacer)</span>
+        </Button>
+      )}
 
       <Button
         variant="secondary"

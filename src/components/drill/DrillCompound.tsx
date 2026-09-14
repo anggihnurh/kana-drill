@@ -466,7 +466,7 @@ export const DrillInputBar: React.FC = () => {
         <Button
           onClick={actions.nextQuestion}
           variant={state.isAllAnswered ? 'success' : 'default'}
-          className="h-12 px-5 font-bold shrink-0 gap-2 shadow-md transition-all cursor-pointer"
+          className="hidden sm:inline-flex h-12 px-5 font-bold shrink-0 gap-2 shadow-md transition-all cursor-pointer"
           title={`Lanjut ke soal berikutnya (${state.cmdKeyText})`}
         >
           {state.isLastQuestion ? (

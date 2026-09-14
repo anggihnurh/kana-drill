@@ -123,7 +123,7 @@ export const RaceScreen: React.FC = () => {
 
       {/* Token Cards Grid */}
       {currentQ && (
-        <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5 pt-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3.5 pt-2">
           {currentQ.tokens.map((token, idx) => (
             <TokenCard
               key={token.id || idx}
@@ -173,7 +173,7 @@ export const RaceScreen: React.FC = () => {
             onClick={() => nextQuestion(3000)}
             disabled={status !== 'racing'}
             variant={isAllAnswered ? 'success' : 'default'}
-            className="h-12 px-5 font-bold shrink-0 gap-2 shadow-md transition-all cursor-pointer"
+            className="hidden sm:inline-flex h-12 px-5 font-bold shrink-0 gap-2 shadow-md transition-all cursor-pointer"
           >
             {isLastQuestion ? (
               <>
