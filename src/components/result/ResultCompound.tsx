@@ -195,13 +195,13 @@ export const ResultRoot: React.FC<ResultRootProps> = ({ children }) => {
 // ==========================================
 export const ResultRankBanner: React.FC = () => {
   const { state } = useResultContext();
-  const { rank, config, maxStreak } = state;
+  const { rank, questions, config, maxStreak } = state;
 
   return (
     <div className="text-center space-y-3 pt-2">
       <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-400 text-xs font-bold font-mono">
         <Award className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
-        <span>Sesi 10 Soal Selesai</span>
+        <span>Sesi {questions.length || 5} Soal Selesai</span>
       </div>
 
       <div className="flex items-center justify-center gap-3">
