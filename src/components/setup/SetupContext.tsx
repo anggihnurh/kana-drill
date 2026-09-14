@@ -6,6 +6,8 @@ export interface SetupState {
   records: SessionRecord[];
   bestRecord: SessionRecord | null;
   isHistoryOpen: boolean;
+  isRaceLobbyOpen: boolean;
+  raceRoomQueryId: string | null;
 }
 
 export interface SetupActions {
@@ -13,6 +15,7 @@ export interface SetupActions {
   startSession: () => void;
   toggleSound: () => void;
   setIsHistoryOpen: (open: boolean) => void;
+  setIsRaceLobbyOpen: (open: boolean) => void;
 }
 
 export interface SetupContextValue {

@@ -1,12 +1,15 @@
 import { Moon, Sun } from 'lucide-react';
 import { DrillScreen } from './components/drill/DrillScreen';
+import { RaceScreen } from './components/race/RaceScreen';
 import { ResultScreen } from './components/result/ResultScreen';
 import { SetupScreen } from './components/setup/SetupScreen';
 import { useDrillStore } from './store/useDrillStore';
+import { useRaceStore } from './store/useRaceStore';
 import { useThemeStore } from './store/useThemeStore';
 
 export function App() {
   const status = useDrillStore((s) => s.status);
+  const raceStatus = useRaceStore((s) => s.status);
   const { theme, toggleTheme } = useThemeStore();
 
   return (
@@ -53,7 +56,9 @@ export function App() {
 
       {/* Main Content Viewport */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-4 py-3 sm:py-6 flex flex-col justify-center sm:justify-center">
-        {status === 'idle' ? (
+        {raceStatus === 'countdown' || raceStatus === 'racing' || raceStatus === 'finished' ? (
+          <RaceScreen />
+        ) : status === 'idle' ? (
           <SetupScreen />
         ) : status === 'running' || status === 'paused' ? (
           <DrillScreen />

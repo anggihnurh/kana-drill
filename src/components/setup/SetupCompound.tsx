@@ -6,13 +6,15 @@ import {
   PlayCircle,
   RotateCcw,
   Sparkles,
-  Trash2
+  Trash2,
+  Zap,
 } from 'lucide-react';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { playSound } from '../../lib/soundEffects';
 import { useDrillStore } from '../../store/useDrillStore';
 import { useHistoryStore } from '../../store/useHistoryStore';
 import { HistoryModal } from '../history/HistoryModal';
+import { RaceLobbyModal } from '../race/RaceLobbyModal';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { SetupContext, SetupContextValue, useSetupContext } from './SetupContext';
@@ -33,7 +35,24 @@ export const SetupRoot: React.FC<SetupRootProps> = ({ children }) => {
   const getBestRecord = useHistoryStore((s) => s.getBestRecord);
 
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isRaceLobbyOpen, setIsRaceLobbyOpen] = useState(false);
+  const [raceRoomQueryId, setRaceRoomQueryId] = useState<string | null>(null);
+
   const bestRecord = useMemo(() => getBestRecord(), [records, getBestRecord]);
+
+  // Check ?race=ROOM_ID in URL query params on mount
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const raceParam = params.get('race');
+      if (raceParam) {
+        setRaceRoomQueryId(raceParam);
+        setIsRaceLobbyOpen(true);
+      }
+    } catch {
+      // Safe fallback
+    }
+  }, []);
 
   const toggleSound = useCallback(() => {
     const next = !config.soundEnabled;
@@ -54,12 +73,15 @@ export const SetupRoot: React.FC<SetupRootProps> = ({ children }) => {
         records,
         bestRecord,
         isHistoryOpen,
+        isRaceLobbyOpen,
+        raceRoomQueryId,
       },
       actions: {
         setConfig,
         startSession,
         toggleSound,
         setIsHistoryOpen,
+        setIsRaceLobbyOpen,
       },
     }),
     [
@@ -67,6 +89,8 @@ export const SetupRoot: React.FC<SetupRootProps> = ({ children }) => {
       records,
       bestRecord,
       isHistoryOpen,
+      isRaceLobbyOpen,
+      raceRoomQueryId,
       setConfig,
       startSession,
       toggleSound,
@@ -78,6 +102,11 @@ export const SetupRoot: React.FC<SetupRootProps> = ({ children }) => {
       <div className="w-full max-w-5xl mx-auto space-y-6 pb-12 animate-pop-in">
         {children}
         <HistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} />
+        <RaceLobbyModal
+          isOpen={isRaceLobbyOpen}
+          onClose={() => setIsRaceLobbyOpen(false)}
+          initialRoomId={raceRoomQueryId}
+        />
       </div>
     </SetupContext.Provider>
   );
@@ -139,7 +168,16 @@ export const SetupSessionOverview: React.FC = () => {
         className="w-full max-w-sm font-bold h-12 text-base gap-2 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-100 dark:text-zinc-900 shadow-sm cursor-pointer"
       >
         <Play className="w-4 h-4 fill-white dark:fill-zinc-900" />
-        <span>Mulai Sesi Drill</span>
+        <span>Mulai Sesi Drill Solo</span>
+      </Button>
+
+      <Button
+        variant="outline"
+        onClick={() => actions.setIsRaceLobbyOpen(true)}
+        className="w-full max-w-sm h-11 gap-2 text-xs font-bold border-amber-500/40 hover:bg-amber-500/10 text-amber-600 dark:text-amber-400 cursor-pointer shadow-sm"
+      >
+        <Zap className="w-4 h-4 fill-amber-500 text-amber-500" />
+        <span>Balapan Online (1v1 TypeRacer)</span>
       </Button>
 
       <Button
