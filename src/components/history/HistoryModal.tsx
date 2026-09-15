@@ -1,10 +1,9 @@
-import React, { useState, useMemo } from 'react';
-import { useHistoryStore } from '../../store/useHistoryStore';
-import { Dialog } from '../ui/dialog';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
+import { Calendar, Clock, Layers, Target, Trash2, Zap } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 import { formatTime } from '../../lib/utils';
-import { Trash2, Calendar, Target, Clock, Zap, Layers } from 'lucide-react';
+import { useHistoryStore } from '../../store/useHistoryStore';
+import { Button } from '../ui/button';
+import { Dialog } from '../ui/dialog';
 
 interface HistoryModalProps {
   isOpen: boolean;
@@ -17,14 +16,8 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) =
   const getLifetimeStats = useHistoryStore((s) => s.getLifetimeStats);
 
   const [confirmClear, setConfirmClear] = useState(false);
-  const [filterScript, setFilterScript] = useState<'all' | 'hiragana' | 'katakana' | 'both'>('all');
 
   const stats = useMemo(() => getLifetimeStats(), [records, getLifetimeStats]);
-
-  const filteredRecords = useMemo(() => {
-    if (filterScript === 'all') return records;
-    return records.filter((r) => r.config.script === filterScript);
-  }, [records, filterScript]);
 
   const handleClear = () => {
     clearHistory();
@@ -36,7 +29,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) =
       isOpen={isOpen}
       onClose={onClose}
       title="Riwayat & Statistik Latihan"
-      description="Rekap performa dan data sesi drill yang tersimpan pada penyimpanan peramban Anda."
+      description="Rekap performa dan data sesi drill Anda"
     >
       <div className="space-y-4">
         {records.length === 0 ? (
@@ -102,40 +95,9 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) =
               </div>
             </div>
 
-            {/* Filter Pills */}
-            <div className="flex items-center justify-between gap-2 pt-1">
-              <div className="flex items-center gap-1.5 overflow-x-auto">
-                {(
-                  [
-                    { key: 'all', label: 'Semua' },
-                    { key: 'hiragana', label: 'Hiragana' },
-                    { key: 'katakana', label: 'Katakana' },
-                    { key: 'both', label: 'Campuran' },
-                  ] as const
-                ).map((f) => (
-                  <button
-                    key={f.key}
-                    type="button"
-                    onClick={() => setFilterScript(f.key)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                      filterScript === f.key
-                        ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
-                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-                    }`}
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </div>
-
-              <span className="text-xs text-zinc-400 font-mono">
-                {filteredRecords.length} sesi
-              </span>
-            </div>
-
             {/* List Riwayat Sesi */}
             <div className="max-h-[42vh] overflow-y-auto space-y-2 pr-1">
-              {filteredRecords.map((rec) => {
+              {records.map((rec) => {
                 const date = new Date(rec.timestamp);
                 const formattedDate = date.toLocaleDateString('id-ID', {
                   day: 'numeric',
@@ -155,12 +117,6 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) =
                           <Calendar className="w-3 h-3 text-zinc-400" />
                           {formattedDate}
                         </span>
-                        <Badge variant="outline" className="text-[10px] uppercase font-mono py-0">
-                          {rec.config.script}
-                        </Badge>
-                        <Badge variant="secondary" className="text-[10px] capitalize py-0">
-                          {rec.config.mode}
-                        </Badge>
                       </div>
 
                       <div className="text-xs text-zinc-600 dark:text-zinc-400 flex items-center gap-3">
@@ -193,7 +149,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) =
             {/* Footer Clear Action */}
             <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800/80 flex items-center justify-between">
               <span className="text-xs text-zinc-500">
-                Maksimal 50 sesi disimpan di LocalStorage
+                Maksimal 50 sesi yang bisa disimpan.
               </span>
 
               {confirmClear ? (
