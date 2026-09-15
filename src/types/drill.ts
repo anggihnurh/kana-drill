@@ -51,6 +51,8 @@ export interface SessionConfig {
   mode: DrillMode;
   categories: KanaCategory[];
   soundEnabled: boolean;
+  allChapters: boolean;
+  selectedChapter: number;
 }
 
 export interface SessionSummary {

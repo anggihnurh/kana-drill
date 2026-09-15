@@ -48,6 +48,8 @@ export const DEFAULT_CONFIG: SessionConfig = {
   mode: 'hybrid',
   categories: ['gojuuon', 'dakuon', 'handakuon', 'youon', 'sokuon', 'chouon', 'tokushuon'],
   soundEnabled: true,
+  allChapters: true,
+  selectedChapter: 1,
 };
 
 export const useDrillStore = create<DrillState>()(
