@@ -170,7 +170,7 @@ export const SetupSessionOverview: React.FC = () => {
         <Play className="w-4 h-4 fill-white dark:fill-zinc-900" />
         <span>Mulai Sesi Drill Solo</span>
       </Button>
-
+      {/* 
       {import.meta.env.DEV && (
         <Button
           variant="outline"
@@ -180,7 +180,7 @@ export const SetupSessionOverview: React.FC = () => {
           <Zap className="w-4 h-4 fill-amber-500 text-amber-500" />
           <span>Balapan Online (1v1 TypeRacer)</span>
         </Button>
-      )}
+      )} */}
 
       <Button
         variant="secondary"
