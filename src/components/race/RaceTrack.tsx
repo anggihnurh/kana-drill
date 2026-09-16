@@ -1,118 +1,68 @@
-import React from 'react';
-import { Flag, Zap, Trophy } from 'lucide-react';
+import { Flag, MapPin, Trophy, Zap } from 'lucide-react';
 import { PlayerProgress } from '../../types/race';
 
 interface RaceTrackProps {
   myProgress: PlayerProgress;
-  opponentProgress: PlayerProgress | null;
-  myName: string;
-  opponentName: string | null;
+  players: PlayerProgress[];
 }
 
-export const RaceTrack: React.FC<RaceTrackProps> = ({
-  myProgress,
-  opponentProgress,
-  myName,
-  opponentName,
-}) => {
+const laneColors = [
+  { dot: 'bg-emerald-500', bar: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' },
+  { dot: 'bg-indigo-500', bar: 'bg-indigo-500', text: 'text-indigo-600 dark:text-indigo-400' },
+  { dot: 'bg-amber-500', bar: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
+  { dot: 'bg-sky-500', bar: 'bg-sky-500', text: 'text-sky-600 dark:text-sky-400' },
+  { dot: 'bg-fuchsia-500', bar: 'bg-fuchsia-500', text: 'text-fuchsia-600 dark:text-fuchsia-400' },
+];
+
+export function RaceTrack({ myProgress, players }: RaceTrackProps) {
+  const racers = [myProgress, ...players];
+
   return (
-    <div className="w-full bg-white/90 dark:bg-zinc-900/90 border border-zinc-200/90 dark:border-zinc-800/90 rounded-2xl p-3 sm:p-4 shadow-sm backdrop-blur-md space-y-3">
-      {/* Header bar */}
+    <div className="w-full space-y-3 rounded-2xl border border-zinc-200/90 bg-white/90 p-3 shadow-sm backdrop-blur-md dark:border-zinc-800/90 dark:bg-zinc-900/90 sm:p-4">
       <div className="flex items-center justify-between text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">
         <div className="flex items-center gap-1.5 uppercase tracking-wider">
-          <Zap className="w-3 h-3 text-amber-500 fill-amber-500" />
-          <span>Lintasan Balapan</span>
+          <Zap className="h-3 w-3 fill-amber-500 text-amber-500" />
+          <span>Progres semua pemain</span>
         </div>
-        <div className="flex items-center gap-1 text-zinc-400 dark:text-zinc-500">
-          <Flag className="w-3 h-3" />
-          <span>Finish</span>
-        </div>
+        <span>{racers.filter((player) => player.isFinished).length}/{racers.length} selesai</span>
       </div>
 
-      {/* Track Lanes */}
-      <div className="space-y-2.5">
-        {/* Lane 1: Player (You) */}
-        <div className="space-y-1">
-          <div className="flex items-center justify-between text-xs px-0.5">
-            <div className="flex items-center gap-1.5 font-bold text-zinc-900 dark:text-zinc-100">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span>{myName} (Kamu)</span>
-              {myProgress.isFinished && (
-                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-mono border border-emerald-500/20">
-                  <Trophy className="w-2.5 h-2.5" /> FINISH
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-2 font-mono text-[11px] text-zinc-600 dark:text-zinc-400">
-              <span>{myProgress.currentCpm} CPM</span>
-              <span className="font-extrabold text-zinc-900 dark:text-zinc-100">
-                {myProgress.progressPercent}%
-              </span>
-            </div>
-          </div>
+      <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+        <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> Start</span>
+        <span className="flex items-center gap-1">Finish <Flag className="h-3 w-3" /></span>
+      </div>
 
-          {/* Minimalist Line Track with Dot */}
-          <div className="relative h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center">
-            {/* Filled line */}
-            <div
-              className="h-full bg-emerald-500 rounded-full transition-all duration-300 ease-out"
-              style={{ width: `${Math.min(100, Math.max(0, myProgress.progressPercent))}%` }}
-            />
-
-            {/* Runner Dot */}
-            <div
-              className="absolute transition-all duration-300 ease-out -translate-x-1/2 z-10"
-              style={{
-                left: `${Math.min(100, Math.max(0, myProgress.progressPercent))}%`,
-              }}
-            >
-              <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900 shadow-sm" />
+      <div className="max-h-56 space-y-3 overflow-y-auto pr-1">
+        {racers.map((player, index) => {
+          const colors = laneColors[index % laneColors.length];
+          const progress = Math.min(100, Math.max(0, player.progressPercent));
+          return (
+            <div key={player.id || 'me'} className="space-y-1">
+              <div className="flex items-center justify-between gap-3 px-0.5 text-xs">
+                <div className="flex min-w-0 items-center gap-1.5 font-bold text-zinc-900 dark:text-zinc-100">
+                  <span className={`h-2 w-2 shrink-0 rounded-full ${colors.dot}`} />
+                  <span className="truncate">{player.name}{index === 0 ? ' (Kamu)' : ''}</span>
+                  {player.isFinished && (
+                    <span className={`inline-flex shrink-0 items-center gap-0.5 text-[10px] font-bold ${colors.text}`}>
+                      <Trophy className="h-3 w-3" /> Selesai
+                    </span>
+                  )}
+                </div>
+                <div className="flex shrink-0 items-center gap-2 font-mono text-[11px] text-zinc-500 dark:text-zinc-400">
+                  <span>{player.currentCpm} CPM</span>
+                  <span className="font-extrabold text-zinc-900 dark:text-zinc-100">{progress}%</span>
+                </div>
+              </div>
+              <div className="relative flex h-2 w-full items-center rounded-full bg-zinc-100 dark:bg-zinc-800">
+                <div className={`h-full rounded-full transition-all duration-300 ease-out ${colors.bar}`} style={{ width: `${progress}%` }} />
+                <div className="absolute z-10 -translate-x-1/2 transition-all duration-300 ease-out" style={{ left: `${progress}%` }}>
+                  <div className={`h-3.5 w-3.5 rounded-full ring-2 ring-white shadow-sm dark:ring-zinc-900 ${colors.dot}`} />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        {/* Lane 2: Opponent */}
-        <div className="space-y-1">
-          <div className="flex items-center justify-between text-xs px-0.5">
-            <div className="flex items-center gap-1.5 font-bold text-zinc-900 dark:text-zinc-100">
-              <span className="w-2 h-2 rounded-full bg-indigo-500" />
-              <span>{opponentName || 'Menunggu Lawan...'}</span>
-              {opponentProgress?.isFinished && (
-                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-mono border border-indigo-500/20">
-                  <Trophy className="w-2.5 h-2.5" /> FINISH
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-2 font-mono text-[11px] text-zinc-600 dark:text-zinc-400">
-              <span>{opponentProgress?.currentCpm || 0} CPM</span>
-              <span className="font-extrabold text-zinc-900 dark:text-zinc-100">
-                {opponentProgress?.progressPercent || 0}%
-              </span>
-            </div>
-          </div>
-
-          {/* Minimalist Line Track with Dot */}
-          <div className="relative h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center">
-            {/* Filled line */}
-            <div
-              className="h-full bg-indigo-500 rounded-full transition-all duration-300 ease-out"
-              style={{
-                width: `${Math.min(100, Math.max(0, opponentProgress?.progressPercent || 0))}%`,
-              }}
-            />
-
-            {/* Runner Dot */}
-            <div
-              className="absolute transition-all duration-300 ease-out -translate-x-1/2 z-10"
-              style={{
-                left: `${Math.min(100, Math.max(0, opponentProgress?.progressPercent || 0))}%`,
-              }}
-            >
-              <div className="w-3.5 h-3.5 rounded-full bg-indigo-500 ring-2 ring-white dark:ring-zinc-900 shadow-sm" />
-            </div>
-          </div>
-        </div>
+          );
+        })}
       </div>
     </div>
   );
-};
+}

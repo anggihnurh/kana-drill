@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { playSound } from '../../lib/soundEffects';
 import { useDrillStore } from '../../store/useDrillStore';
 import { useHistoryStore } from '../../store/useHistoryStore';
+import { useRaceStore } from '../../store/useRaceStore';
 import { HistoryModal } from '../history/HistoryModal';
 import { RaceLobbyModal } from '../race/RaceLobbyModal';
 import { SetupContext, SetupContextValue } from './SetupContext';
@@ -20,6 +21,7 @@ export const SetupRoot: React.FC<SetupRootProps> = ({ children }) => {
 
   const records = useHistoryStore((s) => s.records);
   const getBestRecord = useHistoryStore((s) => s.getBestRecord);
+  const raceStatus = useRaceStore((s) => s.status);
 
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isRaceLobbyOpen, setIsRaceLobbyOpen] = useState(false);
@@ -40,6 +42,11 @@ export const SetupRoot: React.FC<SetupRootProps> = ({ children }) => {
       // Safe fallback
     }
   }, []);
+
+  // SetupRoot mounts again after a race screen closes; keep the active room visible for rematch.
+  useEffect(() => {
+    if (raceStatus === 'lobby') setIsRaceLobbyOpen(true);
+  }, [raceStatus]);
 
   const toggleSound = useCallback(() => {
     const next = !config.soundEnabled;

@@ -24,6 +24,8 @@ Aplikasi web modern untuk melatih refleks membaca cepat dan akurat huruf **Hirag
   - Tombol **Salin Skor** untuk berbagi hasil ke media sosial.
 - **📈 Riwayat & Statistik Seumur Hidup**: Tersimpan otomatis di LocalStorage (Total sesi, Total waktu, Best CPM, Rata-rata akurasi).
 - **🌓 Dark & Light Mode**: Desain modern minimalist dengan glassmorphism dan tema yang nyaman di mata.
+- **🏁 Multiplayer Realtime**: Bagikan satu link room untuk balapan bersama 2 pemain atau lebih, lihat progres semua pemain dari Start sampai Finish, klasemen otomatis setelah semua selesai, dan rematch tanpa membuat room baru.
+- **🧹 Room Otomatis Kedaluwarsa**: Room dan link PeerJS ditutup setelah 5 menit tanpa aktivitas.
 
 ---
 
@@ -68,6 +70,7 @@ Buka browser dan akses **`http://localhost:5173`**.
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS
 - **State Management**: Zustand
+- **Realtime Multiplayer**: PeerJS (WebRTC peer-to-peer dengan host relay)
 - **Icons**: Lucide React
 - **Effects**: canvas-confetti (Dynamic Code-Split)
 - **Audio**: Web Audio API (Zero external assets)

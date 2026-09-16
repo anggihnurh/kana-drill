@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { History, Play } from "lucide-react";
+import { History, Play, Users } from "lucide-react";
 import { Button } from "../ui/button";
 import { useSetupContext } from "./SetupContext";
 
@@ -80,6 +80,15 @@ export const SetupSessionOverview: React.FC = () => {
             >
                 <Play className="w-4 h-4 fill-white dark:fill-zinc-900" />
                 <span>Mulai Sesi Drill Solo</span>
+            </Button>
+
+            <Button
+                variant="outline"
+                onClick={() => actions.setIsRaceLobbyOpen(true)}
+                className="w-full max-w-sm h-11 gap-2 text-sm font-bold cursor-pointer border-emerald-300 bg-emerald-50/70 text-emerald-800 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/20 dark:text-emerald-300 dark:hover:bg-emerald-950/40"
+            >
+                <Users className="w-4 h-4" />
+                <span>Balapan Multiplayer Realtime</span>
             </Button>
 
             <Button

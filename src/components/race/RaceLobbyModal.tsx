@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Check, Play, Loader2, AlertCircle } from 'lucide-react';
+import { Copy, Check, Play, Loader2, AlertCircle, Clock3, Users } from 'lucide-react';
 import { Dialog } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -26,7 +26,8 @@ export const RaceLobbyModal: React.FC<RaceLobbyModalProps> = ({
     roomId,
     role,
     status,
-    opponentName,
+    players,
+    expiresAt,
     isConnecting,
     errorMessage,
     clearError,
@@ -35,6 +36,16 @@ export const RaceLobbyModal: React.FC<RaceLobbyModalProps> = ({
   const [tab, setTab] = useState<'create' | 'join'>('create');
   const [joinInputId, setJoinInputId] = useState('');
   const [copied, setCopied] = useState(false);
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    if (!isOpen || !expiresAt) return;
+    const interval = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(interval);
+  }, [isOpen, expiresAt]);
+
+  const inactiveSeconds = expiresAt ? Math.max(0, Math.ceil((expiresAt - now) / 1000)) : 300;
+  const inactiveTime = `${Math.floor(inactiveSeconds / 60)}:${String(inactiveSeconds % 60).padStart(2, '0')}`;
 
   // Auto-fill roomId if query param exists
   useEffect(() => {
@@ -55,7 +66,14 @@ export const RaceLobbyModal: React.FC<RaceLobbyModalProps> = ({
   const handleJoin = async () => {
     if (!joinInputId.trim()) return;
     try {
-      await joinRoom(joinInputId.trim(), myName);
+      let roomCode = joinInputId.trim();
+      try {
+        const pastedUrl = new URL(roomCode);
+        roomCode = pastedUrl.searchParams.get('race') || roomCode;
+      } catch {
+        // Input is already a room code.
+      }
+      await joinRoom(roomCode, myName);
     } catch {
       // Handled in store
     }
@@ -80,8 +98,8 @@ export const RaceLobbyModal: React.FC<RaceLobbyModalProps> = ({
     <Dialog
       isOpen={isOpen}
       onClose={handleClose}
-      title="Balapan Online (1v1)"
-      description="Adu kecepatan membaca Kana langsung bersama teman secara real-time via P2P."
+      title="Balapan Multiplayer"
+      description="Adu cepat membaca Kana bersama 2 pemain atau lebih secara real-time."
       className="max-w-md w-full"
     >
       <div className="space-y-4">
@@ -144,7 +162,7 @@ export const RaceLobbyModal: React.FC<RaceLobbyModalProps> = ({
             {tab === 'create' ? (
               <div className="space-y-3 pt-1">
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                  Buat room balapan privat, lalu bagikan kode atau link ke temanmu.
+                  Buat room privat, lalu bagikan satu link yang sama ke semua pemain.
                 </p>
                 <Button
                   onClick={handleCreate}
@@ -164,7 +182,7 @@ export const RaceLobbyModal: React.FC<RaceLobbyModalProps> = ({
             ) : (
               <div className="space-y-3 pt-1">
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                  Tempelkan Room Code atau buka link undangan yang diberikan oleh lawanmu.
+                  Tempel Room Code atau link undangan yang diberikan host.
                 </p>
                 <Input
                   value={joinInputId}
@@ -221,26 +239,38 @@ export const RaceLobbyModal: React.FC<RaceLobbyModalProps> = ({
                   </>
                 )}
               </Button>
+
+              <div className="flex items-center justify-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400">
+                <Clock3 className="h-3.5 w-3.5" />
+                <span>Room ditutup jika tidak aktif dalam {inactiveTime}</span>
+              </div>
             </div>
 
-            {/* Status Lawan */}
+            {/* Daftar pemain */}
             <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800/80">
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-3 h-3 rounded-full ${
-                    opponentName ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400 animate-ping'
-                  }`}
-                />
-                <div>
-                  <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-                    {opponentName ? `Lawan: ${opponentName}` : 'Menunggu lawan bergabung...'}
-                  </div>
-                  <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                    {opponentName
-                      ? 'Lawan sudah siap di lintasan!'
-                      : 'Kirim link atau kode room ke temanmu untuk mulai.'}
-                  </div>
+              <div className="mb-3 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                  <Users className="h-4 w-4 text-emerald-500" />
+                  <span>{players.length + 1} pemain di room</span>
                 </div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Live</span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                  <span>{myName} (Kamu{role === 'host' ? ', Host' : ''})</span>
+                </div>
+                {players.map((player) => (
+                  <div key={player.id} className="flex items-center gap-2 text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                    <span className="h-2 w-2 rounded-full bg-indigo-500" />
+                    <span>{player.name}</span>
+                  </div>
+                ))}
+                {players.length === 0 && (
+                  <p className="pl-4 text-[11px] text-zinc-500 dark:text-zinc-400">
+                    Menunggu pemain lain membuka link undangan…
+                  </p>
+                )}
               </div>
             </div>
 
@@ -249,11 +279,11 @@ export const RaceLobbyModal: React.FC<RaceLobbyModalProps> = ({
               {role === 'host' ? (
                 <Button
                   onClick={startRaceCountdown}
-                  disabled={!opponentName}
+                  disabled={players.length < 1}
                   className="w-full h-12 font-black text-base gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20 disabled:opacity-40"
                 >
                   <Play className="w-4 h-4 fill-white" />
-                  <span>Mulai Balapan!</span>
+                  <span>Mulai untuk {players.length + 1} Pemain</span>
                 </Button>
               ) : (
                 <div className="p-3 text-center rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-300 text-xs font-semibold border border-amber-500/20">

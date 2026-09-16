@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { ChevronRight, CornerDownLeft, RotateCcw, Sparkles } from 'lucide-react';
+import { ChevronRight, CornerDownLeft, Loader2, RotateCcw, Sparkles } from 'lucide-react';
 import { useRaceStore } from '../../store/useRaceStore';
 import { RaceTrack } from './RaceTrack';
 import { RaceResultModal } from './RaceResultModal';
@@ -11,10 +11,8 @@ import { cn } from '../../lib/utils';
 export const RaceScreen: React.FC = () => {
   const {
     status,
-    myName,
-    opponentName,
     myProgress,
-    opponentProgress,
+    players,
     questions,
     currentQuestionIndex,
     activeTokenIndex,
@@ -101,10 +99,18 @@ export const RaceScreen: React.FC = () => {
       {/* Lintasan Balapan TypeRacer */}
       <RaceTrack
         myProgress={myProgress}
-        opponentProgress={opponentProgress}
-        myName={myName}
-        opponentName={opponentName}
+        players={players}
       />
+
+      {status === 'waiting' && (
+        <div className="flex items-center justify-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/80 p-5 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-300">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          <div>
+            <p className="text-sm font-bold">Kamu sudah mencapai finish</p>
+            <p className="text-xs opacity-80">Menunggu {players.filter((player) => !player.isFinished).length} pemain lain menyelesaikan balapan…</p>
+          </div>
+        </div>
+      )}
 
       {/* Countdown Overlay (3, 2, 1, Mulai!) */}
       {status === 'countdown' && (
