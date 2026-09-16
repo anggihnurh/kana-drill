@@ -1,0 +1,100 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { playSound } from '../../lib/soundEffects';
+import { useDrillStore } from '../../store/useDrillStore';
+import { useHistoryStore } from '../../store/useHistoryStore';
+import { HistoryModal } from '../history/HistoryModal';
+import { RaceLobbyModal } from '../race/RaceLobbyModal';
+import { SetupContext, SetupContextValue } from './SetupContext';
+
+// ==========================================
+// 1. Setup Root (Provider)
+// ==========================================
+export interface SetupRootProps {
+  children: React.ReactNode;
+}
+
+export const SetupRoot: React.FC<SetupRootProps> = ({ children }) => {
+  const config = useDrillStore((s) => s.config);
+  const setConfig = useDrillStore((s) => s.setConfig);
+  const startSessionStore = useDrillStore((s) => s.startSession);
+
+  const records = useHistoryStore((s) => s.records);
+  const getBestRecord = useHistoryStore((s) => s.getBestRecord);
+
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isRaceLobbyOpen, setIsRaceLobbyOpen] = useState(false);
+  const [raceRoomQueryId, setRaceRoomQueryId] = useState<string | null>(null);
+
+  const bestRecord = useMemo(() => getBestRecord(), [records, getBestRecord]);
+
+  // Check ?race=ROOM_ID in URL query params on mount
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const raceParam = params.get('race');
+      if (raceParam) {
+        setRaceRoomQueryId(raceParam);
+        setIsRaceLobbyOpen(true);
+      }
+    } catch {
+      // Safe fallback
+    }
+  }, []);
+
+  const toggleSound = useCallback(() => {
+    const next = !config.soundEnabled;
+    setConfig({ soundEnabled: next });
+    if (next) {
+      playSound('correct', true);
+    }
+  }, [config.soundEnabled, setConfig]);
+
+  const startSession = useCallback(() => {
+    startSessionStore();
+  }, [startSessionStore]);
+
+  const contextValue: SetupContextValue = useMemo(
+    () => ({
+      state: {
+        config,
+        records,
+        bestRecord,
+        isHistoryOpen,
+        isRaceLobbyOpen,
+        raceRoomQueryId,
+      },
+      actions: {
+        setConfig,
+        startSession,
+        toggleSound,
+        setIsHistoryOpen,
+        setIsRaceLobbyOpen,
+      },
+    }),
+    [
+      config,
+      records,
+      bestRecord,
+      isHistoryOpen,
+      isRaceLobbyOpen,
+      raceRoomQueryId,
+      setConfig,
+      startSession,
+      toggleSound,
+    ]
+  );
+
+  return (
+    <SetupContext.Provider value={contextValue}>
+      <div className="w-full max-w-5xl mx-auto space-y-6 pb-12 animate-pop-in">
+        {children}
+        <HistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} />
+        <RaceLobbyModal
+          isOpen={isRaceLobbyOpen}
+          onClose={() => setIsRaceLobbyOpen(false)}
+          initialRoomId={raceRoomQueryId}
+        />
+      </div>
+    </SetupContext.Provider>
+  );
+};

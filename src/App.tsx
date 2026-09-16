@@ -14,10 +14,8 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-white text-zinc-900 dark:bg-[#09090b] dark:text-zinc-100 flex flex-col justify-between transition-colors duration-200 bg-grid-pattern selection:bg-zinc-900/10 selection:text-zinc-900 dark:selection:bg-zinc-100/10 dark:selection:text-zinc-100">
-      {/* Top Navbar */}
       <header className="w-full border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#09090b] sticky top-0 z-30 transition-colors">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          {/* Logo & Brand — shadcn style: hitam/putih solid */}
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-zinc-900 dark:bg-white flex items-center justify-center font-japanese font-black text-white dark:text-zinc-900 text-base shadow-sm ring-1 ring-zinc-900/10 dark:ring-white/10">
               あ
