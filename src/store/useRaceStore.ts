@@ -64,6 +64,8 @@ const resetProgress = (player: PlayerProgress): PlayerProgress => ({
   isFinished: false,
 });
 
+const normalizePlayerName = (name: string) => name.trim() || 'Pembalap Kana';
+
 export const useRaceStore = create<RaceState>((set, get) => {
   let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
   let countdownTimer: ReturnType<typeof setInterval> | null = null;
@@ -327,12 +329,14 @@ export const useRaceStore = create<RaceState>((set, get) => {
     answeredTokensCount: 0,
 
     setMyName: (name) => {
-      const trimmed = name.trim() || 'Pembalap Kana';
-      localStorage.setItem('kana_player_name', trimmed);
-      set({ myName: trimmed });
+      // Keep the input value as typed so the default name can be cleared and replaced.
+      localStorage.setItem('kana_player_name', name);
+      set({ myName: name });
     },
 
     createRoom: async (name) => {
+      const playerName = normalizePlayerName(name);
+      localStorage.setItem('kana_player_name', playerName);
       get().leaveRace();
       set({ isConnecting: true, errorMessage: null });
       const peerId = `kd_${crypto.randomUUID().replace(/-/g, '').slice(0, 8)}`;
@@ -346,8 +350,8 @@ export const useRaceStore = create<RaceState>((set, get) => {
             roomId: id,
             role: 'host',
             status: 'lobby',
-            myName: name,
-            myProgress: initialProgress(id, name),
+            myName: playerName,
+            myProgress: initialProgress(id, playerName),
             players: [],
             summaries: {},
             isConnecting: false,
@@ -369,6 +373,8 @@ export const useRaceStore = create<RaceState>((set, get) => {
     },
 
     joinRoom: async (targetRoomId, name) => {
+      const playerName = normalizePlayerName(name);
+      localStorage.setItem('kana_player_name', playerName);
       get().leaveRace();
       set({ isConnecting: true, errorMessage: null });
       const roomId = targetRoomId.trim();
@@ -378,14 +384,14 @@ export const useRaceStore = create<RaceState>((set, get) => {
         peer.on('open', (myId) => {
           const connection = peer.connect(roomId, { reliable: true });
           connection.on('open', () => {
-            const me = initialProgress(myId, name);
+            const me = initialProgress(myId, playerName);
             set({
               peer,
               connections: [connection],
               roomId,
               role: 'guest',
               status: 'lobby',
-              myName: name,
+              myName: playerName,
               myProgress: me,
               players: [],
               summaries: {},
