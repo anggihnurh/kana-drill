@@ -1,8 +1,8 @@
+import { Check, Volume2, X } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
-import { TokenItem } from '../../types/drill';
-import { cn } from '../../lib/utils';
-import { Check, X, Volume2 } from 'lucide-react';
 import { speakKana } from '../../hooks/useKanaAudio';
+import { cn } from '../../lib/utils';
+import { TokenItem } from '../../types/drill';
 
 interface TokenCardProps {
   index: number;
@@ -46,15 +46,15 @@ export const TokenCard: React.FC<TokenCardProps> = React.memo(
           'bg-white dark:bg-zinc-900/80 border-zinc-200/90 dark:border-zinc-800/80 text-zinc-900 dark:text-zinc-100 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-sm hover:shadow-md',
           // Active state (glowing ring)
           isActive &&
-            'ring-2 ring-zinc-900 border-zinc-900 bg-zinc-50 text-zinc-900 dark:bg-zinc-800 dark:border-white dark:ring-white dark:text-white scale-[1.03] z-10 shadow-lg',
+          'ring-2 ring-zinc-900 border-zinc-900 bg-zinc-50 text-zinc-900 dark:bg-zinc-800 dark:border-white dark:ring-white dark:text-white scale-[1.03] z-10 shadow-lg',
           // Correct state
           isAnswered &&
-            isCorrect &&
-            'border-emerald-500/70 bg-emerald-50/80 text-emerald-950 dark:border-emerald-700/80 dark:bg-emerald-950/30 dark:text-emerald-100 shadow-emerald-500/5',
+          isCorrect &&
+          'border-emerald-500/70 bg-emerald-50/80 text-emerald-950 dark:border-emerald-700/80 dark:bg-emerald-950/30 dark:text-emerald-100 shadow-emerald-500/5',
           // Mistake state
           isAnswered &&
-            !isCorrect &&
-            'border-rose-500/70 bg-rose-50/80 text-rose-950 dark:border-rose-800/80 dark:bg-rose-950/30 dark:text-rose-100 shadow-rose-500/5'
+          !isCorrect &&
+          'border-rose-500/70 bg-rose-50/80 text-rose-950 dark:border-rose-800/80 dark:bg-rose-950/30 dark:text-rose-100 shadow-rose-500/5'
         )}
       >
         {/* Top row: index number badge & status icon */}
@@ -92,7 +92,7 @@ export const TokenCard: React.FC<TokenCardProps> = React.memo(
         {/* Japanese Kana Text Display - Uniform Typography & Balanced Whitespace */}
         <div className="my-auto py-2 text-center w-full px-1 overflow-hidden flex flex-col items-center justify-center min-h-[56px] sm:min-h-[64px]">
           <span
-            className="font-japanese text-2xl sm:text-3xl lg:text-[32px] font-bold tracking-wide leading-tight block drop-shadow-sm whitespace-nowrap max-w-full truncate"
+            className={cn("font-japanese text-2xl sm:text-3xl lg:text-[30px] font-bold tracking-wide leading-tight block drop-shadow-sm whitespace-nowrap max-w-full truncate", token.kanaText.length > 9 && "lg:text-[24px]")}
             title={token.kanaText}
           >
             {token.kanaText}
