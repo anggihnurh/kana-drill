@@ -70,7 +70,7 @@ export const RaceScreen: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-5 pb-20 sm:pb-24 animate-pop-in">
+    <div className="w-full max-w-5xl mx-auto space-y-3 sm:space-y-5 pb-32 sm:pb-24 animate-pop-in">
       {/* Top Bar with Leave Button */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-baseline gap-2">
@@ -129,7 +129,7 @@ export const RaceScreen: React.FC = () => {
 
       {/* Token Cards Grid */}
       {currentQ && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3.5 pt-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3.5 pt-1 sm:pt-2">
           {currentQ.tokens.map((token, idx) => (
             <TokenCard
               key={token.id || idx}
@@ -143,7 +143,7 @@ export const RaceScreen: React.FC = () => {
       )}
 
       {/* Fixed/Sticky Bottom Input Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 sm:sticky sm:bottom-4 w-full max-w-5xl mx-auto bg-white/95 dark:bg-zinc-900/95 border-t sm:border border-zinc-200/90 dark:border-zinc-800/90 sm:rounded-2xl p-3 sm:p-4 shadow-2xl backdrop-blur-xl pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      <div className="fixed bottom-0 left-0 right-0 z-40 sm:sticky sm:bottom-4 w-full max-w-5xl mx-auto bg-white/95 dark:bg-zinc-900/95 border-t sm:border border-zinc-200/90 dark:border-zinc-800/90 sm:rounded-2xl px-3 pt-3 sm:p-4 shadow-2xl backdrop-blur-xl pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <div className="relative flex-1">
             <Input
@@ -196,7 +196,7 @@ export const RaceScreen: React.FC = () => {
         </div>
 
         {/* Shortcut guide */}
-        <div className="mt-2.5 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 px-1">
+        <div className="mt-2.5 hidden sm:flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 px-1">
           <span>
             Tekan{' '}
             <kbd className="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 rounded font-mono text-[10px] text-zinc-700 dark:text-zinc-300">

@@ -112,7 +112,7 @@ export const RaceLobbyModal: React.FC<RaceLobbyModalProps> = ({
             value={myName}
             onChange={(e) => setMyName(e.target.value)}
             placeholder="Masukkan nama kamu..."
-            className="h-10 text-sm font-medium"
+            className="h-11 text-base sm:text-sm font-medium"
             disabled={status === 'lobby'}
           />
         </div>
@@ -139,7 +139,7 @@ export const RaceLobbyModal: React.FC<RaceLobbyModalProps> = ({
             <div className="flex rounded-xl bg-zinc-100 dark:bg-zinc-800/80 p-1">
               <button
                 onClick={() => setTab('create')}
-                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                className={`flex-1 min-h-10 px-2 py-2 text-xs font-bold rounded-lg transition-all ${
                   tab === 'create'
                     ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
                     : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'
@@ -149,7 +149,7 @@ export const RaceLobbyModal: React.FC<RaceLobbyModalProps> = ({
               </button>
               <button
                 onClick={() => setTab('join')}
-                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                className={`flex-1 min-h-10 px-2 py-2 text-xs font-bold rounded-lg transition-all ${
                   tab === 'join'
                     ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
                     : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'
@@ -188,7 +188,7 @@ export const RaceLobbyModal: React.FC<RaceLobbyModalProps> = ({
                   value={joinInputId}
                   onChange={(e) => setJoinInputId(e.target.value)}
                   placeholder="Contoh: kd_abc123"
-                  className="h-10 text-sm font-mono"
+                  className="h-11 text-base sm:text-sm font-mono"
                 />
                 <Button
                   onClick={handleJoin}
@@ -255,7 +255,7 @@ export const RaceLobbyModal: React.FC<RaceLobbyModalProps> = ({
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Live</span>
               </div>
-              <div className="space-y-2">
+              <div className="max-h-32 space-y-2 overflow-y-auto overscroll-contain pr-1">
                 <div className="flex items-center gap-2 text-xs font-semibold text-zinc-800 dark:text-zinc-200">
                   <span className="h-2 w-2 rounded-full bg-emerald-500" />
                   <span>{myName} (Kamu{role === 'host' ? ', Host' : ''})</span>

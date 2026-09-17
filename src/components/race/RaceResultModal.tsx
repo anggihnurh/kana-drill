@@ -26,14 +26,14 @@ export function RaceResultModal() {
       description="Semua pemain sudah mencapai garis finish. Berikut klasemen akhir room ini."
       className="max-w-2xl w-full"
     >
-      <div className="space-y-5">
+      <div className="space-y-4 sm:space-y-5">
         <div className="flex items-center justify-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500 ring-1 ring-amber-500/20">
+          <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500 ring-1 ring-amber-500/20">
             <Trophy className="h-7 w-7" />
           </div>
         </div>
 
-        <div className="max-h-[48vh] space-y-2 overflow-y-auto pr-1">
+        <div className="max-h-[42dvh] sm:max-h-[48vh] space-y-2 overflow-y-auto overscroll-contain pr-1">
           {ranking.map((player: PlayerProgress, index) => {
             const summary = summaries[player.id];
             const isMe = player.id === myProgress.id;
