@@ -3,7 +3,6 @@ import { playSound } from '../../lib/soundEffects';
 import { useDrillStore } from '../../store/useDrillStore';
 import { useHistoryStore } from '../../store/useHistoryStore';
 import { useRaceStore } from '../../store/useRaceStore';
-import { HistoryModal } from '../history/HistoryModal';
 import { RaceLobbyModal } from '../race/RaceLobbyModal';
 import { SetupContext, SetupContextValue } from './SetupContext';
 
@@ -95,7 +94,6 @@ export const SetupRoot: React.FC<SetupRootProps> = ({ children }) => {
     <SetupContext.Provider value={contextValue}>
       <div className="w-full max-w-5xl mx-auto space-y-6 pb-12 animate-pop-in">
         {children}
-        <HistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} />
         <RaceLobbyModal
           isOpen={isRaceLobbyOpen}
           onClose={() => setIsRaceLobbyOpen(false)}

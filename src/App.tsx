@@ -1,5 +1,7 @@
-import { Moon, Sun } from 'lucide-react';
+import { History, Moon, Sun } from 'lucide-react';
+import React, { useState } from 'react';
 import { DrillScreen } from './components/drill/DrillScreen';
+import { HistoryModal } from './components/history/HistoryModal';
 import { RaceScreen } from './components/race/RaceScreen';
 import { ResultScreen } from './components/result/ResultScreen';
 import { SetupScreen } from './components/setup/SetupScreen';
@@ -11,6 +13,7 @@ export function App() {
   const status = useDrillStore((s) => s.status);
   const raceStatus = useRaceStore((s) => s.status);
   const { theme, toggleTheme } = useThemeStore();
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-white text-zinc-900 dark:bg-[#09090b] dark:text-zinc-100 flex flex-col justify-between transition-colors duration-200 bg-grid-pattern selection:bg-zinc-900/10 selection:text-zinc-900 dark:selection:bg-zinc-100/10 dark:selection:text-zinc-100">
@@ -27,8 +30,19 @@ export function App() {
             </div>
           </div>
 
-          {/* Right Action: Theme toggle */}
-          <div className="flex items-center gap-3">
+          {/* Right Action: History & Theme toggle */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              onClick={() => setIsHistoryOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-xs font-semibold text-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:border-zinc-800 dark:text-zinc-300 transition-all cursor-pointer shadow-sm active:scale-95"
+              title="Lihat Riwayat & Statistik"
+              aria-label="Buka Riwayat dan Statistik"
+            >
+              <History className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
+              <span className="hidden sm:inline">Riwayat &amp; Statistik</span>
+            </button>
+
             <button
               type="button"
               onClick={toggleTheme}
@@ -51,6 +65,10 @@ export function App() {
           </div>
         </div>
       </header>
+
+      {/* Global History Modal */}
+      <HistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} />
+
 
       {/* Main Content Viewport */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-4 py-3 sm:py-6 flex flex-col justify-center sm:justify-center">

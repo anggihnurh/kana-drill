@@ -1,10 +1,13 @@
 import {
+  KanjiEntry,
   Question,
   SessionConfig,
   TokenItem,
   VocabEntry,
 } from '../types/drill';
 import { VOCAB_DATABASE } from '../data/vocabDatabase';
+import { SENTENCE_DATABASE } from '../data/sentenceDatabase';
+import { KANJI_DATABASE } from '../data/kanjiDatabase';
 
 /**
  * Mendapatkan nomor bab dari entri kosakata (Bab 1 - 50)
@@ -41,6 +44,16 @@ function getVocabToken(vocab: VocabEntry, id: string): TokenItem {
   };
 }
 
+function getKanjiToken(kanji: KanjiEntry, id: string): TokenItem {
+  return {
+    id,
+    kanaText: kanji.kanji,
+    meaning: kanji.meaning,
+    script: 'mixed',
+    expectedRomaji: kanji.validRomaji,
+  };
+}
+
 /**
  * Filter pool kosakata berdasarkan bab dan skrip
  */
@@ -72,11 +85,11 @@ export function getFilteredVocab(config: SessionConfig): VocabEntry[] {
 }
 
 /**
- * Generator Utama Sesi Drill Menggunakan Kosakata Minna no Nihongo (Bab 1 - 50)
+ * Generator Sesi Drill Mode KOTOBA (Per Kata)
  * Menghasilkan 5 Soal x 9 Token = 45 Token per sesi.
  * Menjamin tidak ada token yang sama dalam satu soal, dengan pengulangan token yang berbeda antar-soal.
  */
-export function generateSessionQuestions(config: SessionConfig): Question[] {
+function generateKotobaSessionQuestions(config: SessionConfig): Question[] {
   const pool = getFilteredVocab(config);
   const TOTAL_QUESTIONS = 5;
   const TOKENS_PER_QUESTION = 9;
@@ -130,3 +143,109 @@ export function generateSessionQuestions(config: SessionConfig): Question[] {
 
   return questions;
 }
+
+/**
+ * Generator Sesi Drill Mode KANJI (Kanji Dasar MNN I & II + Irodori)
+ * Menghasilkan 5 Soal x 9 Token = 45 Token per sesi.
+ * Mengacak dari seluruh pool KANJI_DATABASE tanpa filter bab.
+ */
+function generateKanjiSessionQuestions(): Question[] {
+  const pool = KANJI_DATABASE;
+  const TOTAL_QUESTIONS = 5;
+  const TOKENS_PER_QUESTION = 9;
+
+  const questions: Question[] = [];
+  let currentDeck: KanjiEntry[] = [];
+
+  for (let q = 0; q < TOTAL_QUESTIONS; q++) {
+    const questionKanji: KanjiEntry[] = [];
+    const usedIdsInQuestion = new Set<string>();
+
+    while (questionKanji.length < TOKENS_PER_QUESTION) {
+      if (currentDeck.length === 0) {
+        currentDeck = shuffleArray(pool);
+      }
+
+      const candidateIndex = currentDeck.findIndex(
+        (item) => !usedIdsInQuestion.has(item.id)
+      );
+
+      if (candidateIndex !== -1) {
+        const [chosen] = currentDeck.splice(candidateIndex, 1);
+        usedIdsInQuestion.add(chosen.id);
+        questionKanji.push(chosen);
+      } else {
+        currentDeck = shuffleArray(pool);
+        if (pool.length < TOKENS_PER_QUESTION) {
+          const fallback = currentDeck.pop()!;
+          questionKanji.push(fallback);
+        }
+      }
+    }
+
+    const questionTokens: TokenItem[] = questionKanji.map((kanji, i) =>
+      getKanjiToken(
+        kanji,
+        `kj_tok_${Date.now()}_q${q}_${i}_${Math.random().toString(36).slice(2, 6)}`
+      )
+    );
+
+    questions.push({
+      questionNumber: q + 1,
+      tokens: questionTokens,
+      durationMs: 0,
+      isCompleted: false,
+    });
+  }
+
+  return questions;
+}
+
+/**
+ * Generator Sesi Drill Mode BUN (Per Kalimat)
+ * Menghasilkan 5 soal, masing-masing berisi 1 TokenItem berupa kalimat utuh.
+ * Mekanisme: typing application — user mengetik romaji kalimat lengkap.
+ */
+function generateSentenceSessionQuestions(): Question[] {
+  const TOTAL_QUESTIONS = 5;
+  const pool = SENTENCE_DATABASE;
+  const shuffled = shuffleArray(pool);
+
+  const questions: Question[] = [];
+  for (let q = 0; q < TOTAL_QUESTIONS; q++) {
+    const sentence = shuffled[q % shuffled.length];
+    const token: TokenItem = {
+      id: `sen_tok_${Date.now()}_q${q}_${Math.random().toString(36).slice(2, 6)}`,
+      kanaText: sentence.kana,
+      meaning: sentence.meaning,
+      script: 'hiragana', // kalimat umumnya campuran, default hiragana
+      expectedRomaji: sentence.validRomaji,
+    };
+
+    questions.push({
+      questionNumber: q + 1,
+      tokens: [token],
+      durationMs: 0,
+      isCompleted: false,
+    });
+  }
+
+  return questions;
+}
+
+/**
+ * Entry point utama generator sesi drill.
+ * Memilih generator berdasarkan `config.inputMode`.
+ */
+export function generateSessionQuestions(config: SessionConfig): Question[] {
+  if (config.inputMode === 'kanji') {
+    return generateKanjiSessionQuestions();
+  }
+  if (config.inputMode === 'bun') {
+    return generateSentenceSessionQuestions();
+  }
+  return generateKotobaSessionQuestions(config);
+}
+
+
+

@@ -19,6 +19,7 @@ import { Input } from '../ui/input';
 import { Progress } from '../ui/progress';
 import { DrillContext, DrillContextValue, useDrillContext } from './DrillContext';
 import { LiveTimer } from './LiveTimer';
+import { SentenceTypingCard } from './SentenceTypingCard';
 import { TokenCard } from './TokenCard';
 
 // ==========================================
@@ -38,6 +39,7 @@ export const DrillRoot: React.FC<DrillRootProps> = ({ children }) => {
   const streak = useDrillStore((s) => s.streak);
   const maxStreak = useDrillStore((s) => s.maxStreak);
   const soundEnabled = useDrillStore((s) => s.config.soundEnabled);
+  const inputMode = useDrillStore((s) => s.config.inputMode ?? 'kotoba');
 
   const setConfig = useDrillStore((s) => s.setConfig);
   const setInput = useDrillStore((s) => s.setInput);
@@ -149,6 +151,7 @@ export const DrillRoot: React.FC<DrillRootProps> = ({ children }) => {
         currentToken,
         cmdKeyText,
         soundEnabled,
+        inputMode,
       },
       actions: {
         setInput,
@@ -181,6 +184,7 @@ export const DrillRoot: React.FC<DrillRootProps> = ({ children }) => {
       currentToken,
       cmdKeyText,
       soundEnabled,
+      inputMode,
       setInput,
       submitCurrentToken,
       selectToken,
@@ -303,7 +307,7 @@ export const DrillHeaderCompound: React.FC = () => {
 };
 
 // ==========================================
-// 3. Drill Token Grid
+// 3a. Drill Token Grid (Kotoba mode)
 // ==========================================
 export const DrillTokenGrid: React.FC = () => {
   const { state, actions } = useDrillContext();
@@ -319,6 +323,25 @@ export const DrillTokenGrid: React.FC = () => {
           onClick={() => actions.selectToken(idx)}
         />
       ))}
+    </div>
+  );
+};
+
+// ==========================================
+// 3b. Drill Sentence Panel (Bun mode)
+// ==========================================
+export const DrillSentencePanel: React.FC = () => {
+  const { state } = useDrillContext();
+  const sentenceToken = state.tokens[0];
+  if (!sentenceToken) return null;
+
+  return (
+    <div className="w-full">
+      <SentenceTypingCard
+        token={sentenceToken}
+        currentInput={state.currentInput}
+        isShaking={state.isInputErrorShake}
+      />
     </div>
   );
 };
@@ -407,7 +430,7 @@ export const DrillInputBar: React.FC = () => {
       return;
     }
 
-    if (e.key === ' ' || e.key === 'Enter') {
+    if (e.key === 'Enter') {
       e.preventDefault();
 
       if (state.currentInput.trim().length > 0) {
@@ -418,7 +441,8 @@ export const DrillInputBar: React.FC = () => {
       if (state.isAllAnswered) {
         actions.nextQuestion();
       }
-    } else if (e.key === 'Tab') {
+    } else if (e.key === 'Tab' && state.inputMode !== 'bun') {
+      // Tab token navigation hanya untuk mode Kotoba
       e.preventDefault();
       const nextIdx = (state.activeTokenIndex + 1) % (state.tokens.length || 9);
       actions.selectToken(nextIdx);
@@ -439,7 +463,13 @@ export const DrillInputBar: React.FC = () => {
             value={state.currentInput}
             onChange={(e) => actions.setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={`Ketik Romaji... Tekan Spasi/Enter`}
+            placeholder={
+              state.inputMode === 'bun'
+                ? 'Ketik romaji kalimat...'
+                : state.inputMode === 'kanji'
+                  ? 'Ketik bacaan kanji (romaji)...'
+                  : 'Ketik Romaji... Tekan Spasi/Enter'
+            }
             autoFocus
             autoComplete="off"
             autoCapitalize="off"
@@ -492,20 +522,26 @@ export const DrillInputBar: React.FC = () => {
           <span>
             Terjawab:{' '}
             <strong className="text-zinc-900 dark:text-zinc-200 font-mono">
-              {state.answeredCount} / {state.tokens.length || 9}
+              {state.answeredCount} / {state.tokens.length || (state.inputMode === 'bun' ? 1 : 9)}
             </strong>
           </span>
           <span>•</span>
           <span className="hidden sm:inline">
-            Tekan{' '}
-            <kbd className="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 rounded font-mono text-[10px] text-zinc-700 dark:text-zinc-300">
-              Spasi
-            </kbd>{' '}
-            atau{' '}
-            <kbd className="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 rounded font-mono text-[10px] text-zinc-700 dark:text-zinc-300">
-              Enter
-            </kbd>{' '}
-            untuk submit token
+            {state.inputMode === 'bun'
+              ? 'Ketik romaji kalimat lengkap'
+              : (
+                <>
+                  Tekan{' '}
+                  <kbd className="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 rounded font-mono text-[10px] text-zinc-700 dark:text-zinc-300">
+                    Spasi
+                  </kbd>{' '}
+                  atau{' '}
+                  <kbd className="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 rounded font-mono text-[10px] text-zinc-700 dark:text-zinc-300">
+                    Enter
+                  </kbd>{' '}
+                  untuk submit token
+                </>
+              )}
           </span>
         </div>
         <div className="text-right hidden sm:block text-[11px]">
@@ -513,11 +549,16 @@ export const DrillInputBar: React.FC = () => {
             <kbd className="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 rounded font-mono text-[10px] text-zinc-700 dark:text-zinc-300 font-semibold">
               {state.cmdKeyText}
             </kbd>{' '}
-            Soal Selanjutnya •{' '}
-            <kbd className="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 rounded font-mono text-[10px] text-zinc-700 dark:text-zinc-300">
-              Tab
-            </kbd>{' '}
-            Pindah Token •{' '}
+            Soal Selanjutnya
+            {state.inputMode !== 'bun' && (
+              <>{' '}•{' '}
+                <kbd className="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 rounded font-mono text-[10px] text-zinc-700 dark:text-zinc-300">
+                  Tab
+                </kbd>{' '}
+                Pindah Token
+              </>
+            )}
+            {' '}•{' '}
             <kbd className="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 rounded font-mono text-[10px] text-zinc-700 dark:text-zinc-300">
               Esc
             </kbd>{' '}
@@ -587,6 +628,7 @@ export const Drill = {
   Root: DrillRoot,
   Header: DrillHeaderCompound,
   TokenGrid: DrillTokenGrid,
+  SentencePanel: DrillSentencePanel,
   TokenCard,
   InputBar: DrillInputBar,
   PauseOverlay: DrillPauseOverlay,

@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from 'react';
-import { Question, TokenItem } from '../../types/drill';
+import { DrillInputMode, Question, TokenItem } from '../../types/drill';
 
 export interface DrillState {
   currentQuestion: number;
@@ -20,6 +20,8 @@ export interface DrillState {
   currentToken: TokenItem | undefined;
   cmdKeyText: string;
   soundEnabled: boolean;
+  /** Mode drill: 'kotoba' atau 'bun' */
+  inputMode: DrillInputMode;
 }
 
 export interface DrillActions {

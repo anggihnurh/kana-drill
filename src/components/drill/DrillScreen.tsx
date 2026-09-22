@@ -4,10 +4,13 @@ import { useDrillStore } from '../../store/useDrillStore';
 
 /**
  * DrillScreen composed with Vercel Composition Patterns
- * Uses compound components (Drill.Root, Drill.Header, Drill.TokenGrid, Drill.InputBar, Drill.PauseOverlay)
+ * Renders different panels based on `config.inputMode`:
+ * - 'kotoba': token-grid (9 kata per soal)
+ * - 'bun': sentence-panel (1 kalimat utuh per soal, typing-app style)
  */
 export const DrillScreen: React.FC = () => {
   const isPaused = useDrillStore((s) => s.status === 'paused');
+  const inputMode = useDrillStore((s) => s.config.inputMode ?? 'kotoba');
 
   return (
     <Drill.Root>
@@ -16,7 +19,11 @@ export const DrillScreen: React.FC = () => {
         <Drill.PauseOverlay />
       ) : (
         <>
-          <Drill.TokenGrid />
+          {inputMode === 'bun' ? (
+            <Drill.SentencePanel />
+          ) : (
+            <Drill.TokenGrid />
+          )}
           <Drill.InputBar />
         </>
       )}

@@ -11,6 +11,41 @@ export type KanaScript = 'hiragana' | 'katakana' | 'both';
 
 export type DrillMode = 'random' | 'vocab' | 'hybrid';
 
+/** Mode input drill: per-kata (kotoba), per-kalimat utuh (bun), atau kanji dasar (kanji) */
+export type DrillInputMode = 'kotoba' | 'bun' | 'kanji';
+
+/** Entri kanji untuk mode Kanji Dasar (MNN I & II + Irodori) */
+export interface KanjiEntry {
+  id: string;
+  /** Karakter kanji tunggal atau senyawa dasar */
+  kanji: string;
+  /** Pembacaan on'yomi dalam katakana */
+  onyomi?: string[];
+  /** Pembacaan kun'yomi dalam hiragana */
+  kunyomi?: string[];
+  /** Arti dalam bahasa Indonesia */
+  meaning: string;
+  /** Daftar romaji & kana yang diterima */
+  validRomaji: string[];
+  /** Kategori tema kanji */
+  category?: string;
+  /** Sumber kurikulum kanji */
+  source?: 'mnn1' | 'mnn2' | 'irodori' | 'both';
+}
+
+/** Entri kalimat untuk mode Bun */
+export interface SentenceEntry {
+  id: string;
+  /** Teks kalimat dalam kana (hiragana/katakana/campuran) */
+  kana: string;
+  /** Arti kalimat dalam bahasa Indonesia */
+  meaning: string;
+  /** Daftar romaji yang diterima (tanpa spasi, lowercase) */
+  validRomaji: string[];
+  /** Nomor bab MNN asal kalimat */
+  chapter: number;
+}
+
 export interface KanaEntry {
   id: string;
   script: 'hiragana' | 'katakana';
@@ -53,6 +88,8 @@ export interface SessionConfig {
   soundEnabled: boolean;
   allChapters: boolean;
   selectedChapter: number;
+  /** Mode drill: 'kotoba' (per kata, default) atau 'bun' (per kalimat utuh) */
+  inputMode: DrillInputMode;
 }
 
 export interface SessionSummary {
