@@ -444,24 +444,24 @@ export const ResultMistakesReview: React.FC = () => {
       </CardHeader>
 
       {hasMistakes ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-2">
+        <div className="grid grid-cols-1 gap-2.5 mt-2">
           {mistakes.map((m, idx) => (
             <div
               key={idx}
-              className="p-3 bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800/80 rounded-xl flex items-center justify-between gap-3 shadow-inner"
+              className="p-3.5 bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800/80 rounded-xl flex items-center justify-between gap-3 shadow-inner"
             >
-              <div>
-                <span className="font-japanese text-2xl font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap block" title={m.kanaText}>
+              <div className="min-w-0 flex-1">
+                <span className="font-japanese text-2xl font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap block truncate" title={m.kanaText}>
                   {m.kanaText}
                 </span>
                 {m.meaning ? (
-                  <span className="text-xs text-zinc-500 block truncate max-w-[150px]">{m.meaning}</span>
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400 block truncate">{m.meaning}</span>
                 ) : null}
-                <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-mono">
+                <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-mono block mt-0.5">
                   Soal #{m.questionIndex} • Token #{m.tokenIndex}
                 </span>
               </div>
-              <div className="text-right font-mono text-xs">
+              <div className="text-right font-mono text-xs shrink-0">
                 <div className="text-rose-600 dark:text-rose-400 line-through">
                   Input: {m.userAnswer}
                 </div>
