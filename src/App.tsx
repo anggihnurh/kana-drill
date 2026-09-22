@@ -1,5 +1,5 @@
 import { History, Moon, Sun } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { DrillScreen } from './components/drill/DrillScreen';
 import { HistoryModal } from './components/history/HistoryModal';
 import { RaceScreen } from './components/race/RaceScreen';
