@@ -50,6 +50,7 @@ export const DEFAULT_CONFIG: SessionConfig = {
   soundEnabled: true,
   allChapters: true,
   selectedChapter: 1,
+  inputMode: 'kotoba',
 };
 
 export const useDrillStore = create<DrillState>()(
