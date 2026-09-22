@@ -84,7 +84,9 @@ export const TokenCard: React.FC<TokenCardProps> = React.memo(
             </div>
           ) : (
             <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500">
-              {token.kanaText.length} kana
+              {/[\u4e00-\u9faf]/.test(token.kanaText)
+                ? `${token.kanaText.length} kanji`
+                : `${token.kanaText.length} kana`}
             </span>
           )}
         </div>

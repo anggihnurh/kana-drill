@@ -463,7 +463,13 @@ export const DrillInputBar: React.FC = () => {
             value={state.currentInput}
             onChange={(e) => actions.setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={state.inputMode === 'bun' ? 'Ketik romaji kalimat...' : 'Ketik Romaji... Tekan Spasi/Enter'}
+            placeholder={
+              state.inputMode === 'bun'
+                ? 'Ketik romaji kalimat...'
+                : state.inputMode === 'kanji'
+                  ? 'Ketik bacaan kanji (romaji)...'
+                  : 'Ketik Romaji... Tekan Spasi/Enter'
+            }
             autoFocus
             autoComplete="off"
             autoCapitalize="off"

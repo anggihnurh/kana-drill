@@ -11,8 +11,27 @@ export type KanaScript = 'hiragana' | 'katakana' | 'both';
 
 export type DrillMode = 'random' | 'vocab' | 'hybrid';
 
-/** Mode input drill: per-kata (kotoba) atau per-kalimat utuh (bun) */
-export type DrillInputMode = 'kotoba' | 'bun';
+/** Mode input drill: per-kata (kotoba), per-kalimat utuh (bun), atau kanji dasar (kanji) */
+export type DrillInputMode = 'kotoba' | 'bun' | 'kanji';
+
+/** Entri kanji untuk mode Kanji Dasar (MNN I & II + Irodori) */
+export interface KanjiEntry {
+  id: string;
+  /** Karakter kanji tunggal atau senyawa dasar */
+  kanji: string;
+  /** Pembacaan on'yomi dalam katakana */
+  onyomi?: string[];
+  /** Pembacaan kun'yomi dalam hiragana */
+  kunyomi?: string[];
+  /** Arti dalam bahasa Indonesia */
+  meaning: string;
+  /** Daftar romaji & kana yang diterima */
+  validRomaji: string[];
+  /** Kategori tema kanji */
+  category?: string;
+  /** Sumber kurikulum kanji */
+  source?: 'mnn1' | 'mnn2' | 'irodori' | 'both';
+}
 
 /** Entri kalimat untuk mode Bun */
 export interface SentenceEntry {
